@@ -28,17 +28,20 @@ service cloud.firestore {
     match /movements/{id} {
       allow read: if act();
       allow create: if act() && mine() && request.resource.data.qty is number
-        && request.resource.data.type in ['OPENING','RESTOCK','SALE','BORROW_OUT','BORROW_RETURN','LOSS'];
+        && request.resource.data.type in ['OPENING','RESTOCK','SALE','SALE_RETURN','BORROW_OUT','BORROW_RETURN','LOSS','ADJUSTMENT']
+        && (request.resource.data.type != 'ADJUSTMENT' || me().role in ['admin','superadmin']);
     }
     match /sales/{id} {
       allow read: if act();
       allow create: if act() && mine() && request.resource.data.total is number;
-      allow update: if act() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['paid','open','ret','borrowOpen']);
+      allow update: if act() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['paid','open','ret','borrowOpen','rtn','adj']);
     }
     match /restocks/{id} { allow read: if act(); allow create: if act() && mine() && request.resource.data.total is number; }
     match /drIndex/{k} { allow read: if act(); allow create: if act(); }
     match /priceHistory/{id} { allow read: if act(); allow create: if act(); }
     match /payments/{id} { allow read: if act(); allow create: if act() && mine() && request.resource.data.amount is number && request.resource.data.amount > 0; }
+    match /returns/{id} { allow read: if act(); allow create: if act() && mine() && request.resource.data.amount is number; }
+    match /stockCounts/{id} { allow read: if act(); allow create: if act() && mine() && me().role in ['admin','superadmin']; }
     match /borrowReturns/{id} { allow read: if act(); allow create: if act() && mine() && request.resource.data.qty is number && request.resource.data.qty > 0; }
   }
 }
