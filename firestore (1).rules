@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function me() { return get(/databases/$(db)/documents/users/$(request.auth.uid)).data; }
+    function act() { return request.auth != null && me().active == true; }
+    function sup() { return act() && me().role == 'superadmin'; }
+    function mine() { return request.resource.data.by == request.auth.uid; }
+
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || sup());
+      allow create: if request.resource.data.role in ['superadmin','admin','encoder'] && (sup() ||
+        (request.auth.uid == uid && request.resource.data.role == 'superadmin' && !exists(/databases/$(db)/documents/meta/app)));
+      allow update, delete: if sup();
+    }
+    match /meta/app {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && getAfter(/databases/$(db)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+    }
+    match /requests/{uid} {
+      allow read, delete: if sup();
+      allow create, update: if request.auth != null && (request.auth.uid == uid || sup());
+    }
+    match /products/{id} {
+      allow read: if act();
+      allow create: if act() && request.resource.data.keys().hasAll(['name','price','cost','stock']);
+      allow update: if act();
+    }
+
+    // Customers are top-level records. Only active signed-in app users may
+    // read/create/update them; deletes are archived by setting active=false.
+    match /customers/{customerId} {
+      allow read: if act();
+      allow create: if act()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.by == request.auth.uid;
+      allow update: if act();
+      allow delete: if sup();
+
+      // Accounts belong to a customer and must be stored under that customer.
+      match /accounts/{accountId} {
+        allow read: if act();
+        allow create: if act()
+          && request.resource.data.code is string
+          && request.resource.data.code.size() > 0
+          && request.resource.data.description is string
+          && request.resource.data.total is number
+          && request.resource.data.total >= 0
+          && request.resource.data.by == request.auth.uid;
+        allow update: if act();
+        // App archives accounts (active=false) to preserve history.
+        allow delete: if sup();
+      }
+    }
+    match /movements/{id} {
+      allow read: if act();
+      allow create: if act() && mine() && request.resource.data.qty is number
+        && request.resource.data.type in ['OPENING','RESTOCK','SALE','SALE_RETURN','BORROW_OUT','BORROW_RETURN','LOSS','ADJUSTMENT','REVERSAL']
+        && (!(request.resource.data.type in ['ADJUSTMENT','REVERSAL']) || me().role in ['admin','superadmin']);
+    }
+    match /sales/{id} {
+      allow read: if act();
+      allow create: if act() && mine() && request.resource.data.total is number;
+      allow update: if act() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['paid','open','ret','borrowOpen','rtn','adj','rev'])
+        && (!('rev' in request.resource.data.diff(resource.data).affectedKeys()) || me().role in ['admin','superadmin']);
+    }
+    match /restocks/{id} { allow read: if act(); allow create: if act() && mine() && request.resource.data.total is number; }
+    match /drIndex/{k} { allow read: if act(); allow create: if act(); }
+    match /priceHistory/{id} { allow read: if act(); allow create: if act(); }
+    match /payments/{id} { allow read: if act(); allow create: if act() && mine() && request.resource.data.amount is number && request.resource.data.amount > 0; }
+    match /returns/{id} { allow read: if act(); allow create: if act() && mine() && request.resource.data.amount is number; }
+    match /stockCounts/{id} { allow read: if act(); allow create: if act() && mine() && me().role in ['admin','superadmin']; }
+    match /auditLogs/{id} { allow read: if act() && me().role in ['admin','superadmin']; allow create: if act() && mine(); }
+    match /syncConflicts/{id} {
+      allow read: if act() && (me().role in ['admin','superadmin'] || resource.data.by == request.auth.uid);
+      allow create: if act() && mine();
+      allow update: if act() && me().role in ['admin','superadmin'] && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','resolution','reason','resolvedBy','resolvedByName','resolvedAt']);
+    }
+    match /borrowReturns/{id} { allow read: if act(); allow create: if act() && mine() && request.resource.data.qty is number && request.resource.data.qty > 0; }
+  }
+}

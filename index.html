@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EBS Inventory System</title>
+<title>EBS Inventory System</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--p:#6d4aff;--pl:#efeaff;--bg:#f5f5f8;--t:#1f2230;--m:#6b7080;--b:#e4e5ec;--g:#16a34a;--a:#d97706;--r:#dc2626}
 *{box-sizing:border-box}[hidden]{display:none!important}
@@ -28,28 +28,186 @@ button{cursor:pointer}button.p{background:var(--p);color:#fff;border-color:var(-
 #lerr{color:var(--r)}#print{display:none;padding:20px}
 @media print{#app,#login{display:none!important}#print{display:block}}
 @media(max-width:800px){#app{flex-direction:column}aside{width:auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px}aside h1{margin:0}nav{display:flex;flex-wrap:wrap}#main{padding:12px}}
-#md{position:fixed;inset:0;background:#0008;display:none;justify-content:center;align-items:flex-start;overflow:auto;padding:16px;z-index:50}#md.on{display:flex}
-.mbox{background:#fff;width:min(940px,100%);border-radius:6px;padding:16px}
+#md{position:fixed;inset:0;background:rgba(28,26,49,.48);backdrop-filter:blur(6px);display:none;justify-content:center;align-items:center;overflow:auto;padding:24px;z-index:50}#md.on{display:flex}.customer-pane{width:min(1180px,96vw)!important;max-height:90vh;overflow:auto;border-radius:24px!important;padding:28px!important;box-shadow:0 24px 80px rgba(22,19,54,.24)}.detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}.summary-box{background:#f7f6ff;border:1px solid var(--b);padding:12px;border-radius:10px}.summary-box span{display:block;color:var(--m);font-size:12px}.summary-box b{font-size:20px}.account-detail{border:1px solid var(--b);border-radius:10px;margin:14px 0;overflow:hidden}.account-detail h4{background:#f7f6ff;padding:12px;margin:0}.account-detail .w{padding:0 12px 12px}.detail-actions{display:flex;gap:8px;flex-wrap:wrap}
+.mbox{background:#fff;width:min(1080px,100%);max-height:90vh;overflow:auto;border-radius:24px;padding:28px;box-shadow:0 24px 80px rgba(22,19,54,.24)}
 .mh{flex:0 1 55%;color:#fff;text-align:center;font:700 24px/1 system-ui;letter-spacing:1px;padding:12px}.mh.s{background:#674ea7}.mh.r{background:#6aa84f}
 .sec{background:#b7b7b7;font-weight:700;letter-spacing:3px;padding:4px 8px;margin:6px 0 8px;width:min(340px,100%)}
 .f2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:10px}.f2 label{display:flex;gap:8px;align-items:center;margin-bottom:4px;font-size:12px}.f2 label input,.f2 label select{flex:1;min-width:0}
 .mt th{color:#fff;text-align:center;border:1px solid #bbb}.mt.s th{background:#8e7cc3}.mt.r th{background:#93c47d}.mt th.g{background:#93c47d}
-.mt td{padding:0;border:1px solid #bbb}.mt input,.mt select{width:100%;border:0;border-radius:0}
+.mt td{padding:0;border:1px solid #bbb}.mt input,.mt select{width:100%;border:0;border-radius:0}.item-search{position:relative;min-width:180px}.item-search input{width:100%;border:0;border-radius:0}.item-suggestions{position:absolute;top:100%;left:0;right:0;max-height:280px;overflow-y:auto;overflow-x:hidden;background:#fff;border:1px solid var(--b);box-shadow:0 6px 18px #0002;z-index:9999;min-width:240px}.suggest-results{max-height:220px;overflow-y:auto}.suggest-footer{position:sticky;bottom:0;background:#f8f7ff;border-top:1px solid var(--b);padding:6px;z-index:3}.suggest-footer button{background:#efeaff;color:#5135c9;font-weight:600}.item-suggestions button{position:relative;z-index:81;display:block;width:100%;text-align:left;cursor:pointer;pointer-events:auto;border:0;border-radius:0;padding:9px 10px;white-space:normal}.item-suggestions button:hover{background:var(--pl);color:var(--p)}.item-suggestions .no-match{padding:9px 10px;color:var(--m)}
 @media(max-width:700px){.f2{grid-template-columns:1fr}}
+
+/* ---------- SellMate-inspired visual refresh ---------- */
+:root{
+  --p:#5140b8;--pl:#f0edff;--bg:#eef0fa;--t:#24243a;--m:#777b91;
+  --b:#e9e9f1;--g:#159b68;--a:#c78316;--r:#d94b5b;
+}
+*{box-sizing:border-box}
+body{font-family:'DM Sans',Inter,system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--t);letter-spacing:-.01em}
+#app{margin:22px;min-height:calc(100vh - 44px);background:#f7f7fb;border:1px solid #e9eaf4;border-radius:28px;overflow:hidden;box-shadow:0 18px 60px rgba(46,42,94,.08)}
+aside{width:248px;background:#fff;border-right:1px solid #efeff5;padding:28px 18px 22px;display:flex;flex-direction:column}
+aside h1{font:800 22px/1.2 'Manrope',sans-serif;color:#302b53;letter-spacing:-.045em;margin:2px 10px 30px}
+nav{display:flex;flex-direction:column;gap:5px}
+nav a{position:relative;display:flex;align-items:center;min-height:43px;padding:11px 14px;border-radius:14px;margin:0;color:#55586d;font-size:13.5px;font-weight:500;transition:background .18s,color .18s,transform .18s}
+nav a:hover{background:#f7f6ff;color:var(--p);transform:translateX(2px)}
+nav a.on{background:#f0edff;color:var(--p);font-weight:700}
+nav a.on:before{content:"";position:absolute;left:0;top:11px;bottom:11px;width:3px;border-radius:4px;background:var(--p)}
+section{flex:1;min-width:0;background:#f7f7fb}
+header{min-height:76px;padding:18px 30px;background:rgba(255,255,255,.94);border-bottom:1px solid #ededf4;gap:14px}
+#net{font-size:12px;font-weight:600}
+#who{font-size:13px;color:#55586d}
+#main{padding:28px 30px 36px}
+h2,h3,h4{font-family:'Manrope','DM Sans',sans-serif;letter-spacing:-.035em;color:#27263b}
+h2{font-size:25px;line-height:1.25;font-weight:700;margin:0 0 22px}
+h2 small{display:inline-block;margin-left:5px;color:var(--m);font:400 12px/1.4 'DM Sans',sans-serif;letter-spacing:0}
+h3{font-size:17px;font-weight:700}
+.card{background:#fff;border:1px solid #ededf4;border-radius:20px;padding:20px;box-shadow:0 4px 16px rgba(35,31,75,.025);margin-bottom:18px}
+.grid{gap:14px;margin-bottom:18px}
+.grid .card{padding:20px 21px;min-height:112px;transition:transform .18s,box-shadow .18s}
+.grid .card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(35,31,75,.06)}
+.grid span{font-size:12px;font-weight:500;color:#777b91}
+.grid b{font:700 27px/1.25 'Manrope',sans-serif;letter-spacing:-.045em;margin-top:10px;color:#26253a}
+input,select,button{font:500 13px/1.35 'DM Sans',sans-serif;padding:10px 13px;border:1px solid #e5e5ef;border-radius:12px;background:#fff;color:#34334b;transition:border-color .15s,box-shadow .15s,background .15s;outline:none}
+input,select{min-height:40px}
+input::placeholder{color:#a2a4b5}
+input:focus,select:focus{border-color:#9b8be8;box-shadow:0 0 0 3px rgba(81,64,184,.1)}
+button{font-weight:600;white-space:normal}
+button:hover:not(:disabled){border-color:#c9c1f3;background:#f8f6ff;color:var(--p)}
+button.p{background:var(--p);color:#fff;border-color:var(--p);box-shadow:0 4px 10px rgba(81,64,184,.14)}
+button.p:hover:not(:disabled){background:#40319f;color:#fff;border-color:#40319f}
+button:disabled{opacity:.48;cursor:not-allowed}
+.f{gap:12px}
+.f label{gap:6px;font-weight:600;color:#666a80;font-size:12px}
+.tag{display:inline-flex;align-items:center;padding:4px 9px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:0}
+.ok{background:#e5f7ef;color:#13845a}.lo{background:#fff4dc;color:#a66a06}.no{background:#ffeaed;color:#c43c4d}
+.w{overflow-x:auto;border-radius:14px}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+th,td{padding:13px 14px;border-bottom:1px solid #f0f0f5;text-align:left;vertical-align:middle}
+th{background:#f8f8fc;color:#777b91;font-size:11px;font-weight:700;letter-spacing:.025em;white-space:nowrap}
+th:first-child{border-top-left-radius:10px}th:last-child{border-top-right-radius:10px}
+td{color:#45465b}
+tbody tr{transition:background .15s}
+tbody tr:hover td{background:#faf9ff}
+tbody tr:last-child td{border-bottom:0}
+td button{padding:7px 10px;font-size:11.5px;border-radius:9px;margin:2px 1px}
+.r{text-align:right}
+/* Split-panel login inspired by the supplied blue reference */
+body:has(#login:not([hidden])){background:linear-gradient(135deg,#0788e8 0%,#0759a7 54%,#064783 100%);min-height:100vh}
+#login{display:flex;align-items:stretch;width:min(1000px,calc(100% - 48px));max-width:none;min-height:560px;margin:clamp(24px,7vh,72px) auto;padding:0;border-radius:24px;overflow:hidden;background:#fff;box-shadow:0 28px 90px rgba(2,35,83,.28);position:relative}
+#login:before{content:"";position:absolute;z-index:2;left:calc(50% - 55px);top:-12%;height:124%;width:125px;background:#fff;border-radius:50%;transform:rotate(-2deg);pointer-events:none}
+#login .login-welcome{position:relative;isolation:isolate;display:flex;flex:1 1 52%;flex-direction:column;justify-content:center;min-width:0;padding:64px 58px;color:#fff;background:linear-gradient(145deg,#087de0 0%,#07549b 80%);overflow:hidden}
+#login .login-welcome:before{content:"";position:absolute;z-index:-1;width:370px;height:370px;border-radius:50%;background:linear-gradient(145deg,#0868ba,#06447f);right:-110px;top:-105px}
+#login .login-welcome:after{content:"";position:absolute;z-index:-1;width:220px;height:220px;border-radius:50%;background:linear-gradient(145deg,#078be9,#0754a0);right:20px;bottom:38px;box-shadow:-250px 100px 0 15px rgba(0,139,239,.62)}
+#login .welcome-kicker{font:700 12px/1.3 'DM Sans',sans-serif;letter-spacing:.22em;text-transform:uppercase;opacity:.8;margin-bottom:18px}
+#login .login-welcome h2{font:800 clamp(28px,3.4vw,42px)/1.1 'Manrope',sans-serif;letter-spacing:.025em;color:#fff;margin:0 0 14px;max-width:340px}
+#login .login-welcome .welcome-sub{font:700 13px/1.5 'DM Sans',sans-serif;letter-spacing:.11em;text-transform:uppercase;margin:0 0 20px;color:#e4f3ff}
+#login .login-welcome .welcome-copy{max-width:330px;color:rgba(255,255,255,.78);font-size:12px;line-height:1.9;margin:0}
+#login .login-form-panel{position:relative;z-index:3;display:flex;flex:1 1 48%;flex-direction:column;justify-content:center;min-width:0;padding:54px 56px 42px 34px;background:#fff}
+#login .login-title{font:800 30px/1.2 'Manrope',sans-serif;letter-spacing:-.045em;color:#26263a;margin:0 0 8px!important}
+#login .login-hint{font-size:12px;color:#85899b;margin:0 0 26px}
+#login .login-fields{display:flex;flex-direction:column;gap:13px}
+#login input,#login button{width:100%;min-height:47px;border-radius:11px}
+#login input{background:#f4f5f8;border-color:#f0f1f5;padding:13px 15px}
+#login input:focus{background:#fff;border-color:#1682d5;box-shadow:0 0 0 3px rgba(22,130,213,.12)}
+#login .login-primary{background:#06477f;border-color:#06477f;color:#fff;font-weight:700;box-shadow:0 5px 12px rgba(6,71,127,.16)}
+#login .login-primary:hover{background:#053b6b;color:#fff;border-color:#053b6b}
+#login .login-divider{display:flex;align-items:center;gap:12px;color:#9296a5;font-size:11px;margin:17px 0 10px}
+#login .login-divider:before,#login .login-divider:after{content:"";height:1px;flex:1;background:#e6e8ef}
+#login #gbtn{background:#fff;color:#44465a;border:1.5px solid #b9bdc8;font-weight:600;box-shadow:none}
+#login #gbtn:hover{background:#f8faff;border-color:#0876c9;color:#075a9c}
+#login .login-foot{font-size:11px;text-align:center;color:#9296a5;margin:22px 0 0}
+#login .login-foot strong{color:#075a9c;font-weight:700}
+#lerr{font-size:12px;margin-top:12px;white-space:pre-line}
+@media(max-width:760px){#login{width:min(500px,calc(100% - 28px));min-height:0;margin:24px auto;flex-direction:column;border-radius:22px}#login:before{display:none}#login .login-welcome{flex:none;min-height:210px;padding:30px 30px 38px}#login .login-welcome:before{width:250px;height:250px;right:-85px;top:-120px}#login .login-welcome:after{width:110px;height:110px;right:18px;bottom:-55px;box-shadow:-300px 60px 0 10px rgba(0,139,239,.4)}#login .login-welcome h2{font-size:30px}#login .login-welcome .welcome-copy{max-width:280px}#login .login-form-panel{padding:30px;flex:auto}#login .login-title{font-size:27px}}
+@media(max-width:420px){#login .login-welcome{min-height:180px;padding:25px 22px}#login .login-form-panel{padding:25px 22px}#login .login-welcome .welcome-copy{font-size:11px}}
+#md{background:rgba(28,26,49,.42);backdrop-filter:blur(5px)}
+.customer-pane{width:min(1080px,97vw)!important;border-radius:24px 0 0 24px!important;padding:28px!important;box-shadow:-16px 0 55px rgba(22,19,54,.16)}
+.detail-head{padding-bottom:18px;border-bottom:1px solid #eeeef5}
+.detail-head .tag{background:#f0edff;color:var(--p)}
+.summary-grid{gap:12px;margin:16px 0 22px}
+.summary-box{background:#f8f7ff;border:1px solid #ece9ff;padding:16px;border-radius:16px}
+.summary-box span{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.035em;color:#777b91}
+.summary-box b{display:block;font:700 21px/1.3 'Manrope',sans-serif;letter-spacing:-.035em;margin-top:7px;color:#29273e}
+.account-detail{border:1px solid #e9e8f2;border-radius:17px;margin:16px 0;overflow:hidden;background:#fff}
+.account-detail h4{background:#f7f6ff;padding:15px 17px;margin:0;font-size:14px}
+.account-detail .w{padding:0 12px 12px}
+.detail-actions{gap:8px}
+.mbox{background:#fff;width:min(1000px,100%);border-radius:22px;padding:24px;box-shadow:0 18px 55px rgba(22,19,54,.14)}
+.mh{border-radius:13px;font:700 17px/1.2 'Manrope',sans-serif;letter-spacing:.04em;padding:14px 18px}
+.mh.s{background:#5140b8}.mh.r{background:#18855f}
+.sec{background:#f3f2fa;color:#5b5874;font-size:11px;letter-spacing:.12em;border-radius:8px;padding:9px 12px;margin:12px 0}
+.f2{gap:22px}
+.f2 label{color:#666a80;font-size:12px;font-weight:600;gap:8px}
+.f2 label input,.f2 label select{border-radius:10px}
+.mt th{font-size:11px;border:1px solid #e7e5f0}
+.mt.s th{background:#6252bd}.mt.r th{background:#218a65}
+.mt th.g{background:#218a65}
+.mt td{border:1px solid #ecebf3}
+.mt input,.mt select{border:0;border-radius:0;min-height:38px}
+.item-suggestions{border:1px solid #e7e5f0;border-radius:12px;box-shadow:0 14px 35px rgba(30,27,64,.14);overflow:hidden}
+.item-suggestions button{padding:11px 13px;border-bottom:1px solid #f1f0f6}
+.suggest-footer{background:#f8f7ff}
+@media(max-width:1000px){
+ #app{margin:12px;min-height:calc(100vh - 24px);border-radius:22px}
+ aside{width:210px;padding:22px 12px}
+ #main{padding:22px}
+ header{padding:16px 22px}
+}
+@media(max-width:800px){
+ #app{margin:8px;min-height:calc(100vh - 16px);border-radius:18px;flex-direction:column}
+ aside{width:auto;display:block;padding:16px;background:#fff;border-right:0;border-bottom:1px solid #efeff5}
+ aside h1{margin:0 8px 14px;font-size:20px}
+ nav{display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:3px}
+ nav a{flex:none;white-space:nowrap;min-height:38px;padding:9px 12px;font-size:12px}
+ nav a.on:before{display:none}
+ #main{padding:18px 14px 24px}
+ header{padding:14px 16px}
+ h2{font-size:22px}
+ .card{padding:15px;border-radius:16px}
+ .customer-pane{width:100%!important;height:100vh;border-radius:0!important;padding:18px!important}
+ .mbox{border-radius:16px;padding:16px}
+}
+@media(max-width:520px){
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .grid .card{padding:14px;min-height:94px}
+ .grid b{font-size:22px}
+ .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ header{align-items:flex-start;flex-direction:column}
+ .detail-actions{width:100%}
+ .detail-actions button{flex:1}
+ #md .mbox{margin:auto}
+ @media(max-width:700px){#md{padding:10px}#md .mbox,#md .customer-pane{width:100%!important;max-height:96vh;padding:16px!important;border-radius:18px!important}.summary-grid{grid-template-columns:1fr 1fr}}
+}
+
+#uiDialog{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(28,26,49,.48);backdrop-filter:blur(6px)}#uiDialog.on{display:flex}.ui-dialog-card{width:min(440px,100%);background:#fff;border:1px solid #ededf4;border-radius:22px;padding:26px;box-shadow:0 24px 80px rgba(22,19,54,.24)}.ui-dialog-card h3{margin:0 0 8px;font:700 19px/1.3 'Manrope',sans-serif}.ui-dialog-card p{margin:0 0 16px;color:var(--m);white-space:pre-line}.ui-dialog-card input,.ui-dialog-card textarea,.ui-dialog-card select{width:100%;margin:6px 0 18px}.ui-dialog-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.ui-dialog-actions button{min-width:88px}
 </style></head><body>
-<div id="login" hidden><div class="card"><h1 style="margin:0;color:var(--p)">EBS Inventory</h1>
-<button id="gbtn" class="p">Sign in with Google (Admin)</button><hr style="width:100%;border:0;border-top:1px solid var(--b)">
-<form id="lform" style="display:flex;flex-direction:column;gap:10px"><input id="em" type="email" placeholder="Encoder email" required><input id="pw" type="password" placeholder="Password" required><button>Sign in (Encoder)</button></form>
-<div id="lerr"></div></div></div>
+<div id="login" hidden>
+  <div class="login-welcome">
+    <div class="welcome-kicker">EBS Inventory System</div>
+    <h2>WELCOME BACK</h2>
+    <p class="welcome-sub">YOUR BUSINESS, IN CONTROL</p>
+    <p class="welcome-copy">Manage your inventory, record sales, track customer accounts, and keep your daily operations organized in one place.</p>
+  </div>
+  <div class="login-form-panel">
+    <h1 class="login-title">Sign in</h1>
+    <p class="login-hint">Enter your account details to continue.</p>
+    <form id="lform" class="login-fields"><input id="em" type="email" placeholder="Encoder email" autocomplete="username" aria-label="Encoder email" required><input id="pw" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password" required><button class="login-primary" type="submit">Sign in</button></form>
+    <div class="login-divider">or</div>
+    <button id="gbtn" type="button">Continue with Google (Admin)</button>
+    <div id="lerr" role="alert" aria-live="polite"></div>
+    <p class="login-foot">Authorized users only · <strong>EBS Inventory</strong></p>
+  </div>
+</div>
 <div id="app" hidden>
 <aside><h1>EBS</h1><nav>
-<a data-p="dash" onclick="go('dash')">Dashboard</a><a data-p="prod" onclick="go('prod')">Products</a><a data-p="sales" onclick="go('sales')">Sales Records</a>
-<a data-p="recv" onclick="go('recv')">Receivables</a><a data-p="borrow" onclick="go('borrow')">Borrowed</a><a data-p="prices" onclick="go('prices')">Price History</a>
+<a data-p="dash" onclick="go('dash')">Dashboard</a><a data-p="daily" onclick="go('daily')">Daily Sales</a><a data-p="prod" onclick="go('prod')">Products</a><a data-p="sales" onclick="go('sales')">Sales Records</a>
+<a data-p="customers" onclick="go('customers')">Customers</a><a data-p="restocks" onclick="go('restocks')">Restock Records</a><a data-p="recv" onclick="go('recv')">Receivables</a><a data-p="borrow" onclick="go('borrow')">Borrowed</a><a data-p="prices" onclick="go('prices')">Price History</a>
 <a data-p="count" onclick="go('count')">Physical Count</a><a data-p="reports" onclick="go('reports')">Reports</a><a data-p="ledger" onclick="go('ledger')">Stock Ledger</a>
 <a data-p="conflicts" onclick="go('conflicts')">Sync Conflicts</a><a data-p="audit" onclick="go('audit')">Audit Log</a><a id="nu" data-p="users" onclick="go('users')" hidden>Users</a></nav></aside>
 <section><header><span id="net"></span><span><span id="who"></span> <button onclick="auth.signOut().then(()=>location.reload())">Sign out</button></span></header>
 <div id="main"></div></section></div>
 <div id="md"></div>
+<div id="uiDialog" aria-live="polite"></div>
 <div id="print"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -60,6 +218,8 @@ firebase.initializeApp(cfg);
 const auth=firebase.auth(),fs=firebase.firestore(),TS=firebase.firestore.FieldValue.serverTimestamp(),inc=firebase.firestore.FieldValue.increment;
 fs.enablePersistence({synchronizeTabs:true}).catch(()=>{}); // offline cache + durable write queue (IndexedDB)
 const $=s=>document.querySelector(s),C=n=>fs.collection(n),nid=n=>fs.collection(n).doc();
+const uuid=()=>globalThis.crypto?.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)});
+const transactionRef=n=>fs.collection(n).doc(uuid());
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const peso=c=>'₱'+(c/100).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
 const toC=v=>Math.round(parseFloat(v||0)*100),pe=c=>(c/100).toFixed(2);
@@ -67,7 +227,30 @@ const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Manila'});
 const dk=s=>s.toUpperCase().replace(/[\/\s]/g,'_');
 const MODES=['Cash','Check','Charge','Borrow','Lost'];
 let me,P={},U={},Q={},D=[],cur='dash',started=false,R=[],unsub=null,PEND=0;
+let sortedProductIds=[], productSignature='', renderQueued=false, lastPageHtml='', productPage=0;
+const PRODUCT_PAGE_SIZE=100;
 const stk=i=>P[i]?.stock||0;
+function refreshProductIndex(){sortedProductIds=Object.keys(P).sort((a,b)=>(P[a]?.name||'').localeCompare(P[b]?.name||''));}
+function signatureOf(obj){try{return JSON.stringify(obj)}catch(_){return String(Object.keys(obj).length)}}
+
+/* ---------- centered app dialogs (replaces browser prompt/confirm/alert) ---------- */
+let dialogBusy=Promise.resolve();
+function showDialog({title='Notice',message='',kind='alert',value='',placeholder='',inputType='text',confirmText='Continue',cancelText='Cancel'}){
+ return new Promise(resolve=>{
+  const host=$('#uiDialog');
+  host.innerHTML=`<div class="ui-dialog-card" role="dialog" aria-modal="true"><h3>${esc(title)}</h3><p>${esc(message)}</p>${kind==='prompt'?`<input id="uiDialogInput" type="${esc(inputType)}" value="${esc(value)}" placeholder="${esc(placeholder)}" autocomplete="off">`:''}<div class="ui-dialog-actions">${kind==='alert'?'':`<button type="button" id="uiDialogCancel">${esc(cancelText)}</button>`}<button type="button" class="p" id="uiDialogOK">${esc(kind==='alert'?'OK':confirmText)}</button></div></div>`;
+  host.classList.add('on');
+  const finish=result=>{host.classList.remove('on');host.innerHTML='';resolve(result)};
+  $('#uiDialogOK').onclick=()=>finish(kind==='prompt'?$('#uiDialogInput').value:kind==='confirm'?true:undefined);
+  const cancel=$('#uiDialogCancel');if(cancel)cancel.onclick=()=>finish(kind==='prompt'?null:false);
+  host.onclick=e=>{if(e.target===host&&kind!=='alert')finish(kind==='prompt'?null:false)};
+  const inp=$('#uiDialogInput');if(inp){inp.addEventListener('keydown',e=>{if(e.key==='Enter'){$('#uiDialogOK').click()}if(e.key==='Escape'&&cancel)cancel.click()});inp.focus();inp.select()}else $('#uiDialogOK').focus();
+ });
+}
+const uiAlert=message=>{showDialog({title:'Notice',message:String(message??''),kind:'alert'});};
+const uiConfirm=(message,title='Please confirm')=>showDialog({title,message:String(message??''),kind:'confirm',confirmText:'Confirm'});
+const uiPrompt=(message,value='',opts={})=>showDialog({title:opts.title||'Enter details',message:String(message??''),kind:'prompt',value:value??'',placeholder:opts.placeholder||'',inputType:opts.inputType||'text',confirmText:opts.confirmText||'Save'});
+
 
 /* ---------- auth ---------- */
 const showLogin=()=>{$('#login').hidden=false;$('#app').hidden=true;$('#lerr').textContent=sessionStorage.m||'';sessionStorage.removeItem('m')};
@@ -78,10 +261,10 @@ auth.onAuthStateChanged(async u=>{
   if(!u)return showLogin();
   try{
     const s=await fs.doc('users/'+u.uid).get();
-    if(s.exists){me={uid:u.uid,...s.data()};return me.active?start():deny('Naka-disable ang account na ito.')}
+    if(s.exists){me={uid:u.uid,...s.data()};return me.active?start():deny('This account is disabled.')}
     const b=await fs.doc('meta/app').get();
     if(!b.exists){
-      if(!confirm('Wala pang superadmin. Gawing superadmin ang account na ito?'))return deny('Cancelled.');
+      if(!await uiConfirm('No superadmin exists yet. Make this account a superadmin?'))return deny('Cancelled.');
       const bt=fs.batch();bt.set(fs.doc('users/'+u.uid),{name:u.displayName||u.email,email:u.email||'',role:'superadmin',active:true,at:TS});bt.set(fs.doc('meta/app'),{bootstrapped:true});
       await bt.commit();return location.reload();
     }
@@ -92,31 +275,34 @@ auth.onAuthStateChanged(async u=>{
 function start(){
   $('#login').hidden=true;$('#app').hidden=false;$('#who').textContent=`${me.name} (${me.role})`;$('#nu').hidden=me.role!=='superadmin';
   if(started)return;started=true;
-  C('products').onSnapshot(s=>{P={};s.forEach(d=>P[d.id]=d.data());soft()},()=>{});
-  if(me.role==='superadmin'){C('users').onSnapshot(s=>{U={};s.forEach(d=>U[d.id]=d.data());soft()},()=>{});C('requests').onSnapshot(s=>{Q={};s.forEach(d=>Q[d.id]=d.data());soft()},()=>{})}
+  C('products').onSnapshot(s=>{const next={};s.forEach(d=>next[d.id]=d.data());const sig=signatureOf(next);if(sig!==productSignature){P=next;productSignature=sig;refreshProductIndex();soft()}},()=>{});
+  if(me.role==='superadmin'){C('users').onSnapshot(s=>{const next={};s.forEach(d=>next[d.id]=d.data());if(signatureOf(next)!==signatureOf(U)){U=next;soft()}},()=>{});C('requests').onSnapshot(s=>{const next={};s.forEach(d=>next[d.id]=d.data());if(signatureOf(next)!==signatureOf(Q)){Q=next;soft()}},()=>{})}
   net();go('dash');checkOutbox();
 }
 const net=()=>{const e=$('#net'),o=navigator.onLine;e.textContent=(o?'● Online':'● Offline — naka-save locally, magsi-sync pag may internet')+(PEND?` · ${PEND} pending sync`:'');e.style.color=o?'var(--g)':'var(--r)'};
 addEventListener('online',()=>{net();if(me)checkOutbox()});addEventListener('offline',net);
-const soft=()=>{if(cur!=='count'&&cur!=='reports')render()};
+const soft=()=>{if(cur==='count'||cur==='reports'||renderQueued)return;renderQueued=true;requestAnimationFrame(()=>{renderQueued=false;if(!$('#md').classList.contains('on'))render()})};
 
 /* ---------- router + page-level queries (limits reads on Spark) ---------- */
 const wk=()=>{const m=new Date(today()+'T00:00:00Z');m.setUTCDate(m.getUTCDate()-(m.getUTCDay()+6)%7);return[...Array(7)].map((_,i)=>new Date(m.getTime()+i*864e5).toISOString().slice(0,10))};
-const LQ={dash:()=>{const w=wk();return C('sales').where('date','>=',w[0]).where('date','<=',w[6])},sales:()=>C('sales').orderBy('date','desc').limit(200),recv:()=>C('sales').where('open','==',true),borrow:()=>C('sales').where('borrowOpen','==',true),ledger:()=>C('movements').orderBy('at','desc').limit(200),prices:()=>C('priceHistory').orderBy('at','desc').limit(200),audit:()=>C('auditLogs').orderBy('at','desc').limit(200),conflicts:()=>me.role==='encoder'?C('syncConflicts').where('by','==',me.uid):C('syncConflicts').orderBy('at','desc').limit(100)};
-const pages={dash,prod,sales,users,recv,borrow,count,reports,ledger,prices,conflicts,audit};
+const LQ={dash:()=>{const w=wk();return C('sales').where('date','>=',w[0]).where('date','<=',w[6])},daily:()=>C('sales').where('date','==',today()),sales:()=>C('sales').orderBy('date','desc').limit(200),recv:()=>C('sales').where('open','==',true),borrow:()=>C('sales').where('borrowOpen','==',true),ledger:()=>C('movements').orderBy('at','desc').limit(200),prices:()=>C('priceHistory').orderBy('at','desc').limit(200),customers:()=>C('customers').orderBy('name').limit(500),restocks:()=>C('restocks').orderBy('date','desc').limit(200),audit:()=>C('auditLogs').orderBy('at','desc').limit(200),conflicts:()=>me.role==='encoder'?C('syncConflicts').where('by','==',me.uid):C('syncConflicts').orderBy('at','desc').limit(100)};
+const pages={dash,daily:dailySales,prod,sales,users,recv,borrow,count,reports,ledger,prices,conflicts,audit,customers,restocks};
 function go(p){
   if(p==='users'&&me.role!=='superadmin')p='dash';
-  cur=p;if(unsub){unsub();unsub=null}D=[];PEND=0;
-  if(LQ[p])unsub=LQ[p]().onSnapshot({includeMetadataChanges:true},s=>{D=s.docs.map(d=>({id:d.id,...d.data(),_p:d.metadata.hasPendingWrites}));PEND=D.filter(x=>x._p).length;net();soft()},()=>{});
+  cur=p;if(p==='prod')productPage=0;lastPageHtml='';if(unsub){unsub();unsub=null}D=[];PEND=0;
+  if(LQ[p])unsub=LQ[p]().onSnapshot(s=>{const next=s.docs.map(d=>({id:d.id,...d.data(),_p:d.metadata.hasPendingWrites}));const changed=signatureOf(next)!==signatureOf(D);D=next;PEND=D.filter(x=>x._p).length;net();if(changed)soft()},()=>{});
   document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));render();
 }
-const render=()=>{$('#main').innerHTML=pages[cur]()};
-const ids=()=>Object.keys(P).sort((a,b)=>P[a].name.localeCompare(P[b].name));
+function render(){ const html=pages[cur](); if(html!==lastPageHtml){$('#main').innerHTML=html;lastPageHtml=html;} if(cur==='prod')updateProductList(); }
+const ids=()=>sortedProductIds;
 const status=id=>{const s=stk(id);return s<0?['no','Negative']:s===0?['no','Out of stock']:s<=(P[id].restock||0)?['lo','Low stock']:['ok','In stock']};
-const filt=()=>{const q=$('#q').value.toLowerCase();document.querySelectorAll('#tb tr').forEach(r=>r.hidden=!r.textContent.toLowerCase().includes(q))};
+function filt(){productPage=0;updateProductList()}
+function changeProductPage(delta){productPage=Math.max(0,productPage+delta);updateProductList()}
+function productRow(i){const p=P[i],s=status(i);return `<tr><td>${esc(p.name)}<td>${esc(p.sku)}<td>${esc(p.unit)}<td class="r">${stk(i)}<td class="r">${p.restock||0}<td class="r">${peso(p.cost||0)}<td class="r">${peso(p.price||0)}<td><span class="tag ${s[0]}">${s[1]}</span><td><button onclick="editPrice('${i}')">Price</button> ${me.role!=='encoder'?`<button onclick="editCost('${i}')">Cost</button> `:''}<button onclick="phist('${i}')">Price History</button> <button onclick="stockHist('${i}')">Stock History</button> <button onclick="editProduct('${i}')">Edit</button> <button onclick="deleteProduct('${i}')">Delete</button></tr>`}
+function updateProductList(){const body=$('#tb');if(!body)return;const q=($('#q')?.value||'').trim().toLowerCase();const all=ids().filter(i=>P[i]&&P[i].active!==false&&(!q||[P[i].name,P[i].sku,P[i].unit].some(v=>String(v||'').toLowerCase().includes(q))));const pages=Math.max(1,Math.ceil(all.length/PRODUCT_PAGE_SIZE));productPage=Math.min(productPage,pages-1);const start=productPage*PRODUCT_PAGE_SIZE;body.innerHTML=all.slice(start,start+PRODUCT_PAGE_SIZE).map(productRow).join('')||'<tr><td colspan="9">No matching products.</td></tr>';const info=$('#productPageInfo');if(info)info.textContent=`Showing ${all.length?start+1:0}–${Math.min(start+PRODUCT_PAGE_SIZE,all.length)} of ${all.length.toLocaleString()} products`;const prev=$('#productPrev'),next=$('#productNext');if(prev)prev.disabled=productPage===0;if(next)next.disabled=productPage>=pages-1;}
 const aud=(bt,action,entity,eid,before,after,reason)=>bt.set(nid('auditLogs'),{action,entity,eid,before:before||null,after:after||null,reason:reason||'',by:me.uid,byName:me.name,role:me.role,at:TS});
 const fmt=t=>t?.toDate?t.toDate().toLocaleString('en-PH',{timeZone:'Asia/Manila',dateStyle:'medium',timeStyle:'short'}):'pending';
-const reportConflict=(m,e)=>fs.doc('syncConflicts/'+m.id).set({kind:m.col,label:m.label,payload:m.payload||'',error:e?(e.code==='permission-denied'?'Duplicate DR o walang permiso':e.message):'Hindi tinanggap ng server sa pag-sync',status:'OPEN',by:me.uid,byName:me.name,at:TS}).catch(()=>{});
+const reportConflict=(m,e)=>fs.doc('syncConflicts/'+m.id).set({kind:m.col,label:m.label,payload:m.payload||'',error:e?(e.code==='permission-denied'?'Duplicate DR number or insufficient permission':e.message):'The server rejected this during sync',status:'OPEN',by:me.uid,byName:me.name,at:TS}).catch(()=>{});
 async function checkOutbox(){ // offline writes the server rejected after a restart would otherwise vanish silently
   const mine=()=>JSON.parse(localStorage.ob||'[]').filter(x=>x.uid===me.uid);if(!mine().length||!navigator.onLine)return;
   try{await fs.waitForPendingWrites();for(const m of mine()){const d=await fs.doc(m.col+'/'+m.id).get({source:'server'});if(!d.exists)reportConflict(m,null)}
@@ -125,10 +311,10 @@ async function checkOutbox(){ // offline writes the server rejected after a rest
 async function send(bt,ok,meta){ // offline-safe commit: never claims "synced" before server confirms
   if(meta){const o=JSON.parse(localStorage.ob||'[]');o.push({...meta,uid:me.uid,at:Date.now()});localStorage.ob=JSON.stringify(o)}
   const done=()=>{if(meta)localStorage.ob=JSON.stringify(JSON.parse(localStorage.ob||'[]').filter(x=>x.id!==meta.id))};
-  const p=bt.commit(),bad=e=>{done();if(meta)reportConflict(meta,e);alert('Na-reject ng server: '+(e.code==='permission-denied'?'DR number ay ginamit na, o walang permiso. Tingnan ang Sync Conflicts.':e.message))};
+  const p=bt.commit(),bad=e=>{done();if(meta)reportConflict(meta,e);uiAlert('Na-reject ng server: '+(e.code==='permission-denied'?'This account does not have permission to write to one of these collections. This does not necessarily mean the DR number is duplicated. Check Sync Conflicts and Firestore Security Rules.':e.message))};
   p.then(done,()=>{});
-  if(!navigator.onLine){p.catch(bad);alert('Naka-save offline; pending sync.');return true}
-  try{await p;alert(ok);return true}catch(e){bad(e);return false}
+  if(!navigator.onLine){p.catch(bad);uiAlert('Saved offline; sync pending.');return true}
+  try{await p;uiAlert(ok);return true}catch(e){bad(e);return false}
 }
 
 /* ---------- dashboard ---------- */
@@ -139,7 +325,7 @@ function dash(){
   const by=w.map(x=>M3.map(m=>sm(x,m))),mx=Math.max(1,...by.flat());
   return `<h2>Dashboard <small>${d} · posted sale value; Lost/Borrow excluded</small></h2><div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap"><button style="background:#674ea7;color:#fff;border-color:#674ea7" onclick="openM('s')">+ Record Sales</button><button style="background:#6aa84f;color:#fff;border-color:#6aa84f" onclick="openM('r')">+ Record Stock</button></div><div class="grid">${c.map(([k,v])=>`<div class="card"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
   <div class="card"><h3 style="margin-top:0">This week <small style="color:var(--m);font-weight:400">${M3.map((m,k)=>`<span style="color:${col[k]}">■</span> ${m}`).join(' ')}</small></h3><div style="display:flex;gap:8px">${w.map((x,i)=>`<div style="flex:1;text-align:center"><div style="display:flex;gap:2px;align-items:flex-end;height:130px;justify-content:center">${by[i].map((v,k)=>`<div title="${M3[k]} ${peso(v)}" style="width:14px;height:${Math.round(v/mx*130)}px;background:${col[k]}"></div>`).join('')}</div><small>${x.slice(5)}</small></div>`).join('')}</div></div>
-  <div class="card w"><h3 style="margin-top:0">Restock list</h3><table><tr><th>Item<th>Stock<th>Level<th>Status</tr>${low.map(i=>`<tr><td>${esc(P[i].name)}<td>${stk(i)}<td>${P[i].restock||0}<td><span class="tag ${status(i)[0]}">${status(i)[1]}</span></tr>`).join('')||'<tr><td colspan=4>Walang low stock.</tr>'}</table></div>`;
+  <div class="card w"><h3 style="margin-top:0">Restock list</h3><table><tr><th>Item<th>Stock<th>Level<th>Status</tr>${low.map(i=>`<tr><td>${esc(P[i].name)}<td>${stk(i)}<td>${P[i].restock||0}<td><span class="tag ${status(i)[0]}">${status(i)[1]}</span></tr>`).join('')||'<tr><td colspan=4>No low-stock items.</tr>'}</table></div>`;
 }
 
 /* ---------- products ---------- */
@@ -149,53 +335,77 @@ function prod(){
   <label>Opening stock<input id="po" type="number" min="0" step="1" value="0"></label><label>Cost ₱<input id="pc" type="number" min="0" step="0.01" value="0"></label>
   <label>Price ₱<input id="pp" type="number" min="0" step="0.01" value="0"></label><label>Restock level<input id="pr" type="number" min="0" step="1" value="0"></label>
   <label>&nbsp;<button class="p">Add product</button></label></form></div>
-  <div class="card w"><input id="q" placeholder="Search…" oninput="filt()" style="margin-bottom:8px"> <button onclick="expStock()">Export CSV</button>${me.role!=='encoder'?' <button onclick="reconcile()">Reconcile stock</button>':''}<table><thead><tr><th>Item<th>SKU<th>Unit<th class="r">Stock<th class="r">Level<th class="r">Avg cost<th class="r">Price<th>Status<th></tr></thead>
-  <tbody id="tb">${ids().map(i=>{const p=P[i],s=status(i);return `<tr><td>${esc(p.name)}<td>${esc(p.sku)}<td>${esc(p.unit)}<td class="r">${stk(i)}<td class="r">${p.restock||0}<td class="r">${peso(p.cost||0)}<td class="r">${peso(p.price||0)}<td><span class="tag ${s[0]}">${s[1]}</span><td><button onclick="editPrice('${i}')">Price</button> ${me.role!=='encoder'?`<button onclick="editCost('${i}')">Cost</button> `:''}<button onclick="phist('${i}')">History</button></tr>`}).join('')}</tbody></table></div>`;
+  <div class="card w"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><input id="q" placeholder="Search name, SKU, or unit…" oninput="filt()" style="flex:1;min-width:180px"> <button onclick="expStock()">Export CSV</button> <button onclick="expTpl()">Download CSV template</button>${me.role!=='encoder'?` <button onclick="$('#imp').click()">Import CSV</button><input type="file" id="imp" accept=".csv,text/csv" hidden onchange="impFile(this)">`:''}${me.role!=='encoder'?' <button onclick="reconcile()">Reconcile stock</button>':''}</div><table><thead><tr><th>Item<th>SKU<th>Unit<th class="r">Stock<th class="r">Level<th class="r">Avg cost<th class="r">Price<th>Status<th>Actions</tr></thead><tbody id="tb"></tbody></table><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding-top:12px"><small id="productPageInfo" aria-live="polite"></small><div><button id="productPrev" onclick="changeProductPage(-1)">Previous</button> <button id="productNext" onclick="changeProductPage(1)">Next</button></div></div></div>`;
 }
 async function addProd(e){
   e.preventDefault();const f=e.target,g=i=>$('#'+i).value.trim(),name=g('pn'),sku=g('ps'),all=Object.values(P);
-  if(sku&&all.some(p=>(p.sku||'').toLowerCase()===sku.toLowerCase()))return alert('May product na gumagamit ng SKU na ito.');
+  if(sku&&all.some(p=>(p.sku||'').toLowerCase()===sku.toLowerCase()))return uiAlert('May product na gumagamit ng SKU na ito.');
   const d=all.find(p=>p.name.toLowerCase()===name.toLowerCase());
-  if(d&&!confirm('May kapareho nang pangalan: '+d.name+'. Idagdag pa rin?'))return;
+  if(d&&!await uiConfirm('A customer/item with this name already exists: '+d.name+'. Add anyway?'))return;
   const r=nid('products'),cost=toC(g('pc')),open=parseInt(g('po'))||0,bt=fs.batch();
   bt.set(r,{name,sku,unit:g('pu'),restock:parseInt(g('pr'))||0,price:toC(g('pp')),cost,stock:Math.max(0,open),active:true,by:me.uid,at:TS});
   const ph=(t,v)=>v>0&&bt.set(nid('priceHistory'),{pid:r.id,type:t,old:0,new:v,src:'Opening',by:me.uid,byName:me.name,at:TS});ph('COST',cost);ph('SELLING',toC(g('pp')));
   if(open>0)bt.set(nid('movements'),{pid:r.id,qty:open,type:'OPENING',ref:r.id,date:today(),by:me.uid,byName:me.name,cost,at:TS});
   if(await send(bt,'Na-add ang product.'))f.reset();
 }
+async function editProduct(id){
+  const p=P[id]; if(!p)return;
+  const name=await uiPrompt('Item name',p.name); if(name===null)return;
+  const sku=await uiPrompt('SKU / Code',p.sku||''); if(sku===null)return;
+  const unit=await uiPrompt('Unit',p.unit||'pc'); if(unit===null)return;
+  const level=await uiPrompt('Restock level',p.restock||0); if(level===null)return;
+  if(!name.trim())return uiAlert('Kailangan ang item name.');
+  if(sku.trim()&&ids().some(x=>x!==id&&(P[x].sku||'').toLowerCase()===sku.trim().toLowerCase()))return uiAlert('May ibang item na gumagamit ng SKU na ito.');
+  const why=await uiPrompt('Reason for editing (audit log)'); if(!why)return;
+  const before={name:p.name,sku:p.sku||'',unit:p.unit||'pc',restock:p.restock||0},after={name:name.trim(),sku:sku.trim(),unit:unit.trim(),restock:Math.max(0,parseInt(level)||0)};
+  const bt=fs.batch();bt.update(fs.doc('products/'+id),after);aud(bt,'PRODUCT_EDIT','products',id,before,after,why);send(bt,'Updated ang item.');
+}
+async function deleteProduct(id){
+  const p=P[id];if(!p)return;
+  if(!await uiConfirm(`Delete ang item na “${p.name}”? Itatago ito sa active list pero pananatilihin ang stock ledger/history.`))return;
+  const why=await uiPrompt('Reason for deletion (required)');if(!why)return;
+  const bt=fs.batch();bt.update(fs.doc('products/'+id),{active:false,deletedAt:TS,deletedBy:me.uid,deleteReason:why});aud(bt,'PRODUCT_DELETE','products',id,{active:true},{active:false},why);send(bt,'Na-delete (archived) ang item; nanatili ang history.');
+}
+async function stockHist(id){
+  $('#md').innerHTML=`<div class="mbox">${mh('s','STOCK HISTORY')}<h3>${esc(P[id]?.name||'Item')}</h3><div id="shb" class="w">Loading…</div></div>`;$('#md').classList.add('on');
+  try{const snap=await C('movements').where('pid','==',id).get();const rows=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.at?.seconds||0)-(a.at?.seconds||0));let bal=rows.reduce((a,m)=>a+(m.qty||0),0);
+    const asc=[...rows].reverse();let running=0;const balances={};asc.forEach(m=>{running+=m.qty||0;balances[m.id]=running});
+    $('#shb').innerHTML=`<table><thead><tr><th>Date<th>Type<th>Reference<th class="r">Qty change<th class="r">Balance after<th>By<th>Reason</tr></thead><tbody>${rows.map(m=>`<tr><td>${esc(m.date||fmt(m.at))}<td>${esc(m.type)}<td>${esc(m.ref||'')}<td class="r">${(m.qty||0)>0?'+':''}${m.qty||0}<td class="r">${balances[m.id]??''}<td>${esc(m.byName||'')}<td>${esc(m.reason||'')}</tr>`).join('')||'<tr><td colspan="7">No stock history available.</td></tr>'}</tbody></table>`;
+  }catch(e){$('#shb').textContent='Error: '+e.message}
+}
 async function editPrice(id){
-  const v=prompt('Bagong selling price ₱',pe(P[id].price));if(v===null)return;const n=toC(v);if(!(n>=0))return alert('Invalid price');if(n===P[id].price)return;
-  const why=prompt('Reason (hal. supplier increase, promo)')||'',bt=fs.batch();
+  const v=await uiPrompt('Bagong selling price ₱',pe(P[id].price));if(v===null)return;const n=toC(v);if(!(n>=0))return uiAlert('Invalid price');if(n===P[id].price)return;
+  const why=await uiPrompt('Reason (hal. supplier increase, promo)')||'',bt=fs.batch();
   bt.update(fs.doc('products/'+id),{price:n});bt.set(nid('priceHistory'),{pid:id,type:'SELLING',old:P[id].price,new:n,src:'Manual',reason:why,by:me.uid,byName:me.name,at:TS});
-  aud(bt,'PRICE_CHANGE','products',id,{price:P[id].price},{price:n},why);send(bt,'Na-update ang price.');
+  aud(bt,'PRICE_CHANGE','products',id,{price:P[id].price},{price:n},why);send(bt,'Updated ang price.');
 }
 async function editCost(id){
-  const v=prompt('Bagong average cost ₱ (manual adjustment, hal. dagdag na gastos)',pe(P[id].cost||0));if(v===null)return;const n=toC(v);if(!(n>=0))return alert('Invalid cost');if(n===(P[id].cost||0))return;
-  const why=prompt('Reason (kailangan)');if(!why)return;const bt=fs.batch();
+  const v=await uiPrompt('New average cost ₱ (manual adjustment, e.g. additional expenses)',pe(P[id].cost||0));if(v===null)return;const n=toC(v);if(!(n>=0))return uiAlert('Invalid cost');if(n===(P[id].cost||0))return;
+  const why=await uiPrompt('Reason (required)');if(!why)return;const bt=fs.batch();
   bt.update(fs.doc('products/'+id),{cost:n});bt.set(nid('priceHistory'),{pid:id,type:'COST',old:P[id].cost||0,new:n,src:'Manual',reason:why,by:me.uid,byName:me.name,at:TS});
-  aud(bt,'COST_ADJUST','products',id,{cost:P[id].cost||0},{cost:n},why);send(bt,'Na-update ang cost.');
+  aud(bt,'COST_ADJUST','products',id,{cost:P[id].cost||0},{cost:n},why);send(bt,'Updated ang cost.');
 }
 const phHead=nm=>`<thead><tr><th>Date${nm?'<th>Item':''}<th>Type<th class="r">Old<th class="r">New<th class="r">Change<th>Source<th>By</tr></thead>`;
 const phRow=(h,nm)=>`<tr><td>${fmt(h.at)}${nm?`<td>${esc(P[h.pid]?.name)}`:''}<td>${h.type==='COST'?'Cost':'Selling'}<td class="r">${peso(h.old||0)}<td class="r">${peso(h.new)}<td class="r">${h.old?((h.new-h.old)/h.old*100).toFixed(1)+'%':'—'}<td>${h.src||(h.ref?'Restock':'Manual')}${h.reason?' · '+esc(h.reason):''}<td>${esc(h.byName)}</tr>`;
 async function phist(id){
   K='h';$('#md').innerHTML=`<div class="mbox">${mh('s','PRICE HISTORY')}<h3>${esc(P[id].name)}</h3><div class="w" id="phb">Loading…</div></div>`;$('#md').classList.add('on');
   try{const s=await C('priceHistory').where('pid','==',id).get(),l=s.docs.map(d=>d.data()).sort((a,b)=>(b.at?.seconds??9e9)-(a.at?.seconds??9e9));
-    $('#phb').innerHTML=`<table>${phHead(0)}<tbody>${l.map(h=>phRow(h,0)).join('')||'<tr><td colspan=7>Walang history.'}</tbody></table>`}catch(e){$('#phb').textContent=e.message}
+    $('#phb').innerHTML=`<table>${phHead(0)}<tbody>${l.map(h=>phRow(h,0)).join('')||'<tr><td colspan=7>No history available.'}</tbody></table>`}catch(e){$('#phb').textContent=e.message}
 }
-const prices=()=>`<h2>Price History <small>pinakabagong 200 · cost at selling</small></h2><div class="card w"><input id="q" placeholder="Search item…" oninput="filt()" style="margin-bottom:8px"><table>${phHead(1)}<tbody id="tb">${D.map(h=>phRow(h,1)).join('')}</tbody></table></div>`;
+function prices(){return `<h2>Price History <small>pinakabagong 200 · cost at selling</small></h2><div class="card w"><input id="q" placeholder="Search item…" oninput="filt()" style="margin-bottom:8px"><table>${phHead(1)}<tbody id="tb">${D.map(h=>phRow(h,1)).join('')}</tbody></table></div>`; }
 
 /* ---------- line editor + entry modals ---------- */
 let K=null;
 const blank=n=>[...Array(n)].map(()=>({pid:'',qty:'',price:'',np:''})),mq=r=>parseInt(r.qty)||0;
 const opts=v=>'<option value="">Select item</option>'+ids().filter(i=>P[i].active!==false).map(i=>`<option value="${i}" ${i===v?'selected':''}>${esc(P[i].name)}</option>`).join('');
 const mh=(k,t)=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px"><button onclick="closeM()">◀ Close</button><div class="mh ${k}">${t}</div></div>`;
-function openM(k){K=k;R=blank(10);$('#md').innerHTML=k==='s'?saleForm():restForm();$('#md').classList.add('on');drawRows()}
-function closeM(){K=null;$('#md').classList.remove('on');$('#md').innerHTML=''}
-const clearM=()=>{if(confirm('I-clear ang form?'))openM(K)};
+function openM(k){K=k;selectedCustomer=null;customerCache=[];accountCache=[];R=blank(10);$('#md').innerHTML=k==='s'?saleForm():restForm();$('#md').classList.add('on');document.body.style.overflow='hidden';drawRows()}
+function closeM(){K=null;$('#md').classList.remove('on');$('#md').innerHTML='';document.body.style.overflow=''}
+const clearM=async()=>{if(await uiConfirm('I-clear ang form?'))openM(K)};
 function drawRows(){
   const s=K==='s';
   $('#rows').innerHTML=R.map((r,i)=>`<tr><td style="width:80px"><input type="number" min="1" step="1" value="${r.qty}" oninput="setR(${i},'qty',this.value)">
-  <td><select onchange="setR(${i},'pid',this.value)">${opts(r.pid)}</select>
+  <td><div class="item-search"><input type="text" autocomplete="off" placeholder="Type item name…" value="${esc(r.pid?(P[r.pid]?.name||''):(r.search||''))}" oninput="searchItem(${i},this.value)" aria-label="Search item"><div class="item-suggestions" id="suggest${i}" hidden></div></div>
   ${s?`<td class="r" style="width:110px">${r.pid?peso(P[r.pid].cost||0):''}<td style="width:110px"><input type="number" min="0" step="0.01" value="${r.price}" oninput="setR(${i},'price',this.value)">`
      :`<td style="width:110px"><input type="number" min="0" step="0.01" value="${r.price}" oninput="setR(${i},'price',this.value)"><td style="width:110px"><input type="number" min="0" step="0.01" value="${r.np||''}" oninput="setR(${i},'np',this.value)">`}
   <td class="r" style="width:110px" id="lt${i}">${s?'<td class="r" style="width:110px" id="rs'+i+'">':''}</tr>`).join('');
@@ -207,45 +417,73 @@ function tot(){
   if(!s){$('#sub').textContent=peso(t);t+=toC($('#r_other').value)+toC($('#r_del').value)}
   $('#tot').textContent=peso(t);
 }
+function searchItem(i,value){
+  R[i].search=value;R[i].pid='';
+  const box=$('#suggest'+i);if(!box)return;
+  const q=value.trim().toLocaleLowerCase();
+  if(!q){box.hidden=true;box.innerHTML='';tot();return}
+  const found=ids().filter(id=>P[id].active!==false&&String(P[id].name||'').toLocaleLowerCase().includes(q)).slice(0,30);
+  box.innerHTML=found.length?found.map(id=>`<button type="button" data-choose-item="1" data-row="${i}" data-pid="${esc(id)}">${esc(P[id].name)} <small style="color:var(--m)">${stk(id)} in stock</small></button>`).join(''):'<div class="no-match">No matching items found.</div>';
+  box.hidden=false;tot();
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-choose-item]');if(!b)return;e.preventDefault();chooseItem(Number(b.dataset.row),b.dataset.pid)});
+function chooseItem(i,id){R[i].search='';setR(i,'pid',id)}
 function setR(i,k,v){R[i][k]=v;if(k==='pid'){if(v){R[i].price=pe(K==='s'?P[v].price:P[v].cost);if(!mq(R[i]))R[i].qty=1}drawRows()}else tot()}
 const addR=()=>{R.push(...blank(5));drawRows()};
 function saleForm(){
   return `<div class="mbox">${mh('s','SALES')}<div class="sec">SOLD TO :</div><div class="f2"><div>
-  <label>Date<input id="s_date" type="date" value="${today()}"></label><label>Customer name<input id="s_cust"></label><label>Acct name<input id="s_acc"></label></div><div>
-  <label>Mode of payment<select id="s_mode">${MODES.map(m=>`<option>${m}</option>`).join('')}</select></label><label>DR Number<input id="s_dr"></label><label>PO Number<input id="s_po"></label><label>SI Number<input id="s_si"></label></div></div>
+  <label>Date<input id="s_date" type="date" value="${today()}"></label><label>Customer <div class="item-search"><input id="s_cust" autocomplete="off" placeholder="Type to search customers…" onfocus="searchCustomer(this.value)" oninput="searchCustomer(this.value)"><div id="cust-suggest" class="item-suggestions" hidden></div></div></label><label>Account <div class="item-search"><input id="s_acc" autocomplete="off" placeholder="Select a customer first" onfocus="searchAccount(this.value)" oninput="searchAccount(this.value)" disabled><div id="acct-suggest" class="item-suggestions" hidden></div></div></label></div><div>
+  <label>Mode of payment<select id="s_mode">${MODES.map(m=>`<option>${m}</option>`).join('')}</select></label><label>DR Number (Optional)<input id="s_dr" placeholder="Optional"></label><label>PO Number (Optional)<input id="s_po" placeholder="Optional"></label><label>SI Number (Optional)<input id="s_si" placeholder="Optional"></label></div></div>
   <div class="w"><table class="mt s"><thead><tr><th>Quantity<th>Description<th>Base Price<th>Price<th>Total Price<th class="g">Remaining Stock</tr></thead><tbody id="rows"></tbody></table></div>
   <div style="display:flex;justify-content:space-between;margin:8px 0"><button onclick="addR()">+ Rows</button><span><b>TOTAL</b> &nbsp; <b id="tot">₱0.00</b></span></div>
   <input id="s_notes" placeholder="Notes (required for Lost)" style="width:100%;margin-bottom:10px"><button style="background:#8e7cc3;color:#fff" onclick="clearM()">Clear</button> <button style="background:#8e7cc3;color:#fff" id="pb" onclick="postSale()">Add Record</button></div>`;
 }
+let selectedCustomer=null, customerCache=[], accountCache=[];
+async function getCustomers(){if(customerCache.length)return customerCache;const snap=await C('customers').limit(500).get();customerCache=snap.docs.map(d=>({id:d.id,...d.data()})).filter(c=>c.active!==false);return customerCache}
+async function searchCustomer(value){const box=$('#cust-suggest');if(!box)return;selectedCustomer=null;accountCache=[];$('#s_acc').value='';$('#s_acc').disabled=true;const q=(value||'').trim().toLowerCase();try{const all=await getCustomers(),hits=all.filter(c=>(c.name||'').toLowerCase().includes(q)).slice(0,12);box.innerHTML=`<div class="suggest-results">${hits.map(c=>`<button type="button" data-customer-id="${esc(c.id)}">${esc(c.name)} <small>${esc(c.contact||'')}</small></button>`).join('')||'<div class="no-match">No matching customers found.</div>'}</div><div class="suggest-footer"><button type="button" data-add-customer="1">+ Add new customer</button></div>`;box.hidden=false}catch(e){box.innerHTML='<div class="no-match">Unable to load customers: '+esc(e.message)+'</div><div class="suggest-footer"><button type="button" data-add-customer="1">+ Add new customer</button></div>';box.hidden=false}}
+async function chooseCustomer(id){try{const all=await getCustomers(),c=all.find(x=>x.id===id);if(!c)return;selectedCustomer=c;$('#s_cust').value=c.name;$('#cust-suggest').hidden=true;$('#s_acc').disabled=false;$('#s_acc').placeholder='Type to search accounts…';const snap=await C('customers/'+id+'/accounts').get();accountCache=snap.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.active!==false);$('#s_acc').focus();searchAccount('')}catch(e){uiAlert('Unable to load customer accounts: '+e.message)}}
+function searchAccount(value){const box=$('#acct-suggest');if(!box||!selectedCustomer)return;const q=(value||'').trim().toLowerCase();const hits=accountCache.filter(a=>`${a.code||''} ${a.description||''}`.toLowerCase().includes(q)).slice(0,15);box.innerHTML=`<div class="suggest-results">${hits.map(a=>`<button type="button" data-account-id="${esc(a.id)}">${esc(a.code)} — ${esc(a.description)} <small>${peso(a.total||0)}</small></button>`).join('')||'<div class="no-match">No matching accounts found.</div>'}</div><div class="suggest-footer"><button type="button" data-add-account="1">+ Add account for ${esc(selectedCustomer.name)}</button></div>`;box.hidden=false}
+function chooseAccount(id){const a=accountCache.find(x=>x.id===id);if(!a)return;$('#s_acc').value=a.code+' — '+a.description;$('#acct-suggest').hidden=true}
+async function quickAddCustomer(){const name=await uiPrompt('Customer name');if(!name||!name.trim())return;const contact=await uiPrompt('Contact number (optional)')||'',address=await uiPrompt('Address (optional)')||'';const ref=nid('customers'),data={name:name.trim(),contact,address,notes:'',active:true,by:me.uid,byName:me.name,at:TS};try{await ref.set(data);customerCache=[];await getCustomers();await chooseCustomer(ref.id);$('#s_cust').value=name.trim();uiAlert('Customer added successfully.')}catch(e){uiAlert('Unable to add customer: '+e.message+'\nCheck Firestore Security Rules and permissions.')}}
+async function quickAddAccount(){if(!selectedCustomer)return uiAlert('Select a customer first.');const code=await uiPrompt('Account code');if(!code||!code.trim())return;const description=await uiPrompt('Account description');if(!description||!description.trim())return;const total=await uiPrompt('Account total (₱)','0');if(total===null||!Number.isFinite(Number(total))||Number(total)<0)return uiAlert('Invalid account total.');const ref=nid('customers/'+selectedCustomer.id+'/accounts'),data={code:code.trim(),description:description.trim(),total:toC(total),active:true,by:me.uid,byName:me.name,at:TS};try{await ref.set(data);accountCache.push({id:ref.id,...data});chooseAccount(ref.id);uiAlert('Account added to '+selectedCustomer.name+'.')}catch(e){uiAlert('Unable to add account: '+e.message+'\nCheck Firestore Security Rules and permissions.')}}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-customer-id]');if(c){e.preventDefault();chooseCustomer(c.dataset.customerId);return}const a=e.target.closest('[data-account-id]');if(a){e.preventDefault();chooseAccount(a.dataset.accountId);return}if(e.target.closest('[data-add-customer]')){e.preventDefault();quickAddCustomer();return}if(e.target.closest('[data-add-account]')){e.preventDefault();quickAddAccount();return}if(!e.target.closest('#s_cust')&&!e.target.closest('#cust-suggest')&&$('#cust-suggest'))$('#cust-suggest').hidden=true;if(!e.target.closest('#s_acc')&&!e.target.closest('#acct-suggest')&&$('#acct-suggest'))$('#acct-suggest').hidden=true});
 async function postSale(){
   const g=i=>$('#'+i).value.trim(),mode=g('s_mode'),dr=g('s_dr'),date=g('s_date')||today();
   const lines=R.filter(r=>r.pid).map(r=>({pid:r.pid,name:P[r.pid].name,qty:parseInt(r.qty),price:toC(r.price),cost:P[r.pid].cost||0}));
-  if(!lines.length||lines.some(l=>!(l.qty>0)||!(l.price>=0)))return alert('Check items, qty at price.');
-  if(new Set(lines.map(l=>l.pid)).size!==lines.length)return alert('May dobleng item. Pagsamahin sa isang line.');
-  if(!g('s_cust'))return alert('Customer name ang kailangan.');
-  if(mode!=='Lost'&&!dr)return alert('DR number ang kailangan.');
-  if(mode==='Lost'&&!g('s_notes'))return alert('Reason sa Notes ang kailangan para sa Lost.');
+  if(!lines.length||lines.some(l=>!(l.qty>0)||!(l.price>=0)))return uiAlert('Check items, quantity, and price.');
+  if(new Set(lines.map(l=>l.pid)).size!==lines.length)return uiAlert('Duplicate item detected. Combine quantities into one line.');
+  if(!g('s_cust'))return uiAlert('Customer name is required.');
+  if(mode==='Lost'&&!g('s_notes'))return uiAlert('A reason in Notes is required for Lost transactions.');
   let negReason='';const neg=lines.filter(l=>l.qty>stk(l.pid));
-  if(neg.length){negReason=prompt('Lalampas sa stock: '+neg.map(l=>l.name).join(', ')+'.\nReason para ituloy?')||'';if(!negReason)return}
+  if(neg.length){negReason=await uiPrompt('This will exceed available stock: '+neg.map(l=>l.name).join(', ')+'.\nReason for proceeding?')||'';if(!negReason)return}
   const total=lines.reduce((a,l)=>a+l.qty*l.price,0);
-  if(!confirm(`I-post ang ${mode} na ${peso(total)}?`))return;
-  const r=nid('sales'),type={Lost:'LOSS',Borrow:'BORROW_OUT'}[mode]||'SALE',bt=fs.batch(); // client-generated id = idempotent retry
+  if(!await uiConfirm(`I-post ang ${mode} na ${peso(total)}?`))return;
+  const r=transactionRef('sales'),type={Lost:'LOSS',Borrow:'BORROW_OUT'}[mode]||'SALE',bt=fs.batch(); // UUID transaction ID; external document numbers are optional
   bt.set(r,{date,customer:g('s_cust'),account:g('s_acc'),mode,dr,po:g('s_po'),si:g('s_si'),notes:g('s_notes'),lines,total,negReason,paid:0,open:mode==='Charge',borrowOpen:mode==='Borrow',ret:{},by:me.uid,byName:me.name,at:TS});
   lines.forEach(l=>{bt.set(nid('movements'),{pid:l.pid,qty:-l.qty,type,ref:r.id,date,by:me.uid,byName:me.name,cost:l.cost,at:TS});bt.update(fs.doc('products/'+l.pid),{stock:inc(-l.qty)})});
-  if(dr)bt.set(fs.doc('drIndex/'+dk(dr)),{sale:r.id});
   $('#pb').disabled=true;
-  if(await send(bt,'Na-post.',{col:'sales',id:r.id,label:`Sale DR ${dr||'-'} · ${g('s_cust')} · ${peso(total)}`,payload:JSON.stringify({date,customer:g('s_cust'),account:g('s_acc'),mode,dr,po:g('s_po'),si:g('s_si'),notes:g('s_notes'),lines:lines.map(l=>({pid:l.pid,qty:l.qty,price:l.price}))})}))closeM();else $('#pb').disabled=false;
+  if(await send(bt,'Sale posted successfully.',{col:'sales',id:r.id,label:`Sale DR ${dr||'-'} · ${g('s_cust')} · ${peso(total)}`,payload:JSON.stringify({date,customer:g('s_cust'),account:g('s_acc'),mode,dr,po:g('s_po'),si:g('s_si'),notes:g('s_notes'),lines:lines.map(l=>({pid:l.pid,qty:l.qty,price:l.price}))})}))closeM();else $('#pb').disabled=false;
 }
+
+/* ---------- daily sales ---------- */
+function dailySales(){
+ const d=today(),rows=D.filter(s=>s.date===d&&!s.rev),posted=rows.filter(s=>!['Borrow','Lost'].includes(s.mode));
+ const total=posted.reduce((n,s)=>n+(s.total||0),0),cash=rows.filter(s=>s.mode==='Cash').reduce((n,s)=>n+(s.total||0),0),check=rows.filter(s=>s.mode==='Check').reduce((n,s)=>n+(s.total||0),0),charge=rows.filter(s=>s.mode==='Charge').reduce((n,s)=>n+(s.total||0),0);
+ return `<div class="detail-head" style="margin-bottom:18px"><div><h2 style="margin-bottom:5px">Daily Sales</h2><small style="color:var(--m)">Today's transactions · ${d}</small></div><div class="detail-actions"><button class="p" onclick="openM('s')">＋ Record Sales</button><button onclick="expSales()">Export CSV</button></div></div>
+ <div class="grid"><div class="card"><span>Total Sales Today</span><b>${peso(total)}</b></div><div class="card"><span>Transactions</span><b>${rows.length}</b></div><div class="card"><span>Cash</span><b>${peso(cash)}</b></div><div class="card"><span>Check</span><b>${peso(check)}</b></div><div class="card"><span>Charge</span><b>${peso(charge)}</b></div></div>
+ <div class="card w"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px"><h3 style="margin:0">Today's Transactions</h3><span class="tag">${rows.length} records</span></div><table><thead><tr><th>Time / Date</th><th>DR No.</th><th>Customer</th><th>Account</th><th>Payment</th><th class="r">Amount</th><th>Encoder</th><th>Actions</th></tr></thead><tbody>${rows.map(s=>`<tr><td>${esc(s.date||d)}</td><td>${esc(s.dr||'—')}</td><td>${esc(s.customer||'—')}</td><td>${esc(s.account||'—')}</td><td><span class="tag ${s.mode==='Charge'?'lo':s.mode==='Cash'?'ok':''}">${esc(s.mode||'—')}</span></td><td class="r"><b>${peso(s.total||0)}</b></td><td>${esc(s.byName||'—')}</td><td><button onclick="viewSale('${s.id}')">View</button> <button onclick="printDR('${s.id}')">Print</button></td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--m)">No sales transactions recorded today.</td></tr>'}</tbody></table></div>`;
+}
+function viewSale(id){const s=D.find(x=>x.id===id);if(!s)return;$('#md').innerHTML=`<div class="mbox"><div class="detail-head"><div><span class="tag">TRANSACTION DETAILS</span><h2 style="margin:8px 0">DR ${esc(s.dr||'—')}</h2><div style="color:var(--m)">${esc(s.date||'')} · ${esc(s.customer||'')} · ${esc(s.mode||'')}</div></div><button onclick="closeM()">Close</button></div><div class="summary-grid"><div class="summary-box"><span>Total</span><b>${peso(s.total||0)}</b></div><div class="summary-box"><span>Paid</span><b>${peso(s.paid||0)}</b></div><div class="summary-box"><span>Balance</span><b>${peso(Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0)))}</b></div></div><div class="card w"><table><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Unit Price</th><th class="r">Line Total</th></tr></thead><tbody>${(s.lines||[]).map(l=>`<tr><td>${esc(l.name||P[l.pid]?.name||'Item')}</td><td class="r">${l.qty||0}</td><td class="r">${peso(l.price||0)}</td><td class="r">${peso((l.qty||0)*(l.price||0))}</td></tr>`).join('')}</tbody></table></div><div style="display:flex;justify-content:flex-end;gap:8px"><button onclick="printDR('${s.id}')">Print Receipt</button><button class="p" onclick="closeM()">Done</button></div></div>`;$('#md').classList.add('on');}
 
 /* ---------- sales records + print ---------- */
 function sales(){
   return `<h2>Sales Records <small>pinakabagong 200</small></h2><div class="card w"><input id="q" placeholder="Search DR / customer / PO / SI" oninput="filt()" style="margin-bottom:8px"> <button onclick="expSales()">Export CSV</button>
   <table><thead><tr><th>Date<th>DR<th>Customer<th>PO<th>SI<th>Mode<th class="r">Total<th>By<th></tr></thead><tbody id="tb">
-  ${D.map(s=>`<tr><td>${esc(s.date)}<td>${esc(s.dr)}<td>${esc(s.customer)}<td>${esc(s.po)}<td>${esc(s.si)}<td>${s.mode}${s.rev?' <span class="tag no" title="'+esc(s.rev.reason)+'">VOIDED</span>':''}${s.negReason?' <span class="tag lo" title="'+esc(s.negReason)+'">neg stock</span>':''}${s._p?' <span class="tag">pending sync</span>':''}${s.adj?' <span class="tag lo">returns</span>':''}<td class="r">${peso(s.total)}<td>${esc(s.byName)}<td><button onclick="printDR('${s.id}')">Print</button> ${!s.rev&&['Cash','Check','Charge'].includes(s.mode)?`<button onclick="openRet('${s.id}')">Return</button>`:''} ${!s.rev&&me.role!=='encoder'?`<button onclick="voidSale('${s.id}')">Void</button>`:''}</tr>`).join('')}</tbody></table></div>`;
+  ${D.map(s=>`<tr><td>${esc(s.date)}<td>${esc(s.dr)}<td>${esc(s.customer)}<td>${esc(s.po)}<td>${esc(s.si)}<td>${s.mode}${s.rev?' <span class="tag no" title="'+esc(s.rev.reason)+'">VOIDED</span>':''}${s.negReason?' <span class="tag lo" title="'+esc(s.negReason)+'">neg stock</span>':''}${s._p?' <span class="tag">pending sync</span>':''}${s.adj?' <span class="tag lo">returns</span>':''}<td class="r">${peso(s.total)}<td>${esc(s.byName)}<td><button onclick="printDR('${s.id}')">Print</button> ${!s.rev&&['Cash','Check','Charge'].includes(s.mode)?`<button onclick="openRet('${s.id}')">Return</button>`:''} ${!s.rev&&me.role!=='encoder'?`<button onclick="voidSale('${s.id}')">Delete / Reverse</button>`:''}</tr>`).join('')}</tbody></table></div>`;
 }
 function printDR(id){
   const s=D.find(x=>x.id===id);
-  $('#print').innerHTML=`<h2>EBS — Delivery Receipt</h2><p>DR No: <b>${esc(s.dr)}</b> &nbsp; Date: ${esc(s.date)}<br>Customer: ${esc(s.customer)} ${esc(s.account)}<br>PO: ${esc(s.po)} &nbsp; SI: ${esc(s.si)} &nbsp; Payment: ${s.mode}</p>
+  $('#print').innerHTML=`<h2>EBS — Sales Receipt</h2><p>Transaction ID: <b>${esc(s.id)}</b><br>DR No: <b>${esc(s.dr||'—')}</b> &nbsp; Date: ${esc(s.date)}<br>Customer: ${esc(s.customer)} ${esc(s.account||'')}<br>PO: ${esc(s.po||'—')} &nbsp; SI: ${esc(s.si||'—')} &nbsp; Payment: ${s.mode}</p>
   <table><tr><th>Item<th>Qty<th class="r">Price<th class="r">Total</tr>${s.lines.map(l=>`<tr><td>${esc(l.name)}<td>${l.qty}<td class="r">${peso(l.price)}<td class="r">${peso(l.qty*l.price)}</tr>`).join('')}</table>
   <h3 style="text-align:right">Total ${peso(s.total)}</h3><p>Prepared by: ${esc(s.byName)}</p><p style="margin-top:50px">Received by: ____________________</p>`;
   window.print();
@@ -262,15 +500,16 @@ function restForm(){
 async function postRest(){
   const g=i=>$('#'+i).value.trim(),date=g('r_date')||today();
   const lines=R.filter(r=>r.pid).map(r=>({pid:r.pid,name:P[r.pid].name,qty:parseInt(r.qty),cost:toC(r.price),np:r.np?toC(r.np):null}));
-  if(!lines.length||lines.some(l=>!(l.qty>0)||!(l.cost>=0)||(l.np!==null&&!(l.np>=0))))return alert('Check items, qty at cost.');
-  if(new Set(lines.map(l=>l.pid)).size!==lines.length)return alert('May dobleng item. Pagsamahin sa isang line.');
-  if(!g('r_sup'))return alert('Supplier ang kailangan.');
+  if(!lines.length||lines.some(l=>!(l.qty>0)||!(l.cost>=0)||(l.np!==null&&!(l.np>=0))))return uiAlert('Check items, quantity, and cost.');
+  if(new Set(lines.map(l=>l.pid)).size!==lines.length)return uiAlert('Duplicate item detected. Combine quantities into one line.');
+  if(!g('r_sup'))return uiAlert('Supplier is required.');
   const other=toC(g('r_other')),del=toC(g('r_del')),charges=other+del,sub=lines.reduce((a,l)=>a+l.qty*l.cost,0),total=sub+charges;
-  if(!(charges>=0))return alert('Invalid charges.');
+  if(!(charges>=0))return uiAlert('Invalid charges.');
   let left=charges;lines.forEach((l,i)=>{l.alloc=i===lines.length-1?left:(sub?Math.round(charges*l.qty*l.cost/sub):0);left-=l.alloc});
-  if(!confirm(`I-post ang restock na ${peso(total)}?`))return;
-  const r=nid('restocks'),bt=fs.batch();
+  if(!await uiConfirm(`Post restock for ${peso(total)}?`))return;
+  const r=transactionRef('restocks'),bt=fs.batch();
   lines.forEach(l=>{
+    l.oldCost=P[l.pid].cost||0;l.oldPrice=P[l.pid].price||0;
     const landed=l.qty*l.cost+l.alloc,have=Math.max(0,stk(l.pid)),avg=Math.round((have*(P[l.pid].cost||0)+landed)/(have+l.qty));l.landedUnit=Math.round(landed/l.qty);
     bt.set(nid('movements'),{pid:l.pid,qty:l.qty,type:'RESTOCK',ref:r.id,date,by:me.uid,byName:me.name,cost:l.landedUnit,at:TS});
     const up={cost:avg,stock:inc(l.qty)};if(l.np!==null)up.price=l.np;bt.update(fs.doc('products/'+l.pid),up);
@@ -279,29 +518,90 @@ async function postRest(){
   });
   bt.set(r,{date,supplier:g('r_sup'),ref:g('r_ref'),notes:g('r_notes'),lines,subtotal:sub,other,delivery:del,total,by:me.uid,byName:me.name,at:TS});
   $('#pb').disabled=true;
-  if(await send(bt,'Na-post ang restock.',{col:'restocks',id:r.id,label:`Restock ${g('r_sup')} · ${peso(total)}`}))closeM();else $('#pb').disabled=false;
+  if(await send(bt,'Restock posted successfully.',{col:'restocks',id:r.id,label:`Restock ${g('r_sup')} · ${peso(total)}`}))closeM();else $('#pb').disabled=false;
 }
 
 /* ---------- receivables / borrowed / csv ---------- */
+function customers(){
+ return `<h2>Customers <small>customers at kanilang accounts</small></h2><div class="card"><form class="f" onsubmit="addCustomer(event)"><label>Customer name<input id="cn" required></label><label>Contact number<input id="ct"></label><label>Address<input id="ca"></label><label>Notes<input id="cnotes"></label><label>&nbsp;<button class="p">+ Add customer</button></label></form></div><div class="card w"><input id="q" placeholder="Search customer…" oninput="filt()"><table><thead><tr><th>Customer<th>Contact<th>Address<th>Accounts<th>Actions</tr></thead><tbody id="tb">${D.filter(c=>c.active!==false).map(c=>`<tr><td>${esc(c.name)}<td>${esc(c.contact||'')}<td>${esc(c.address||'')}<td>${c.accountCount||'—'}<td><button class="p" onclick="customerDetails('${c.id}')">Details</button> <button onclick="manageAccounts('${c.id}')">Manage accounts</button> <button onclick="editCustomer('${c.id}')">Edit</button> <button onclick="deleteCustomer('${c.id}')">Archive</button></tr>`).join('')}</tbody></table></div>`;
+}
+
+async function viewCustomerTransactions(id){
+ const c=D.find(x=>x.id===id);if(!c)return;
+ $('#md').innerHTML=`<div class="mbox"><div class="detail-head"><div><span class="tag">CUSTOMER TRANSACTIONS</span><h2 style="margin:8px 0 4px">${esc(c.name)}</h2><div style="color:var(--m)">Sales, charges, payments and transaction details</div></div><button onclick="closeM()">Close</button></div><div id="customer-transactions-content" style="margin-top:18px">Loading transactions…</div></div>`;$('#md').classList.add('on');
+ try{const snap=await C('sales').where('customer','==',c.name).limit(500).get();const rows=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));const charges=rows.filter(s=>s.mode==='Charge'&&!s.rev),sum=fn=>fn.reduce((n,s)=>n+(s.total||0),0),balance=charges.reduce((n,s)=>n+Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0)),0);
+ $('#customer-transactions-content').innerHTML=`<div class="summary-grid"><div class="summary-box"><span>Transactions</span><b>${rows.length}</b></div><div class="summary-box"><span>Total Charges</span><b>${peso(sum(charges))}</b></div><div class="summary-box"><span>Payments</span><b>${peso(charges.reduce((n,s)=>n+(s.paid||0),0))}</b></div><div class="summary-box"><span>Outstanding</span><b style="color:var(--r)">${peso(balance)}</b></div></div><div class="card w"><table><thead><tr><th>Date</th><th>DR</th><th>Account</th><th>Mode</th><th class="r">Total</th><th class="r">Paid</th><th class="r">Balance</th><th>Actions</th></tr></thead><tbody>${rows.map(s=>`<tr><td>${esc(s.date||'—')}</td><td>${esc(s.dr||'—')}</td><td>${esc(s.account||'—')}</td><td>${esc(s.mode||'—')}</td><td class="r">${peso(s.total||0)}</td><td class="r">${peso(s.paid||0)}</td><td class="r">${peso(Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0)))}</td><td><button onclick="viewSale('${s.id}')">View</button> <button onclick="printDR('${s.id}')">Print</button></td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;padding:28px">No transactions found for this customer.</td></tr>'}</tbody></table></div>`;
+ }catch(e){$('#customer-transactions-content').textContent='Unable to load transactions: '+e.message}
+}
+
+async function customerDetails(id){
+ const c=D.find(x=>x.id===id);if(!c)return;
+ $('#md').innerHTML=`<div class="mbox customer-pane"><div class="detail-head"><div><div class="tag">CUSTOMER DETAILS</div><h2 style="margin:8px 0 4px">${esc(c.name)}</h2><div style="color:var(--m)">${esc(c.contact||'No contact')} · ${esc(c.address||'No address')}</div></div><div class="detail-actions"><button onclick="manageAccounts('${id}')">Manage Accounts</button><button onclick="$('#md').classList.remove('on')">Close</button></div></div><div id="customer-detail-content" style="margin-top:18px">Loading accounts and transactions…</div></div>`;
+ $('#md').classList.add('on');
+ try{
+  const [as,ss]=await Promise.all([C('customers/'+id+'/accounts').get(),C('sales').where('customer','==',c.name).limit(500).get()]);
+  const accounts=as.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.active!==false);
+  const sales=ss.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const belongs=(s,a)=>{const v=String(s.account||'').toLowerCase(),code=String(a.code||'').toLowerCase(),desc=String(a.description||'').toLowerCase();return v===`${code} — ${desc}`.toLowerCase()||v===`${code} - ${desc}`.toLowerCase()||(code&&v.includes(code))||(desc&&v.includes(desc));};
+  const accountSales=accounts.map(a=>({a,rows:sales.filter(s=>belongs(s,a))}));
+  const charged=sales.filter(s=>s.mode==='Charge');const totalCharge=charged.reduce((n,s)=>n+(s.total||0),0),totalPaid=charged.reduce((n,s)=>n+(s.paid||0),0),balance=charged.reduce((n,s)=>n+Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0)),0);
+  const tableRows=rows=>rows.map(s=>{const bal=Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0));return `<tr><td>${esc(s.date||'—')}<td>${esc(s.dr||'—')}<td>${esc(s.mode||'—')}<td class="r">${peso(s.total||0)}<td class="r">${peso(s.paid||0)}<td class="r">${peso(bal)}<td>${s.mode==='Charge'&&bal>0?`<button onclick="recordCustomerPayment('${s.id}')">Record Payment</button> <button onclick="hist('${s.id}')">History</button>`:'—'}</tr>`}).join('');
+  $('#customer-detail-content').innerHTML=`<div class="summary-grid"><div class="summary-box"><span>Total Charges</span><b>${peso(totalCharge)}</b></div><div class="summary-box"><span>Total Payments</span><b>${peso(totalPaid)}</b></div><div class="summary-box"><span>Outstanding Balance</span><b style="color:var(--r)">${peso(balance)}</b></div><div class="summary-box"><span>Accounts</span><b>${accounts.length}</b></div></div><h3>Accounts & Transactions</h3>${accountSales.map(({a,rows})=>{const cr=rows.filter(s=>s.mode==='Charge'),ch=cr.reduce((n,s)=>n+(s.total||0),0),pd=cr.reduce((n,s)=>n+(s.paid||0),0),bal=cr.reduce((n,s)=>n+Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0)),0);return `<div class="account-detail"><h4 style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><span>${esc(a.code)} — ${esc(a.description)}</span><button onclick="viewAccountTransactions('${id}','${a.id}')">View Transactions</button></h4><div class="summary-grid" style="padding:0 12px"><div class="summary-box"><span>Account Total</span><b>${peso(a.total||0)}</b></div><div class="summary-box"><span>Charges</span><b>${peso(ch)}</b></div><div class="summary-box"><span>Paid</span><b>${peso(pd)}</b></div><div class="summary-box"><span>Balance Due</span><b style="color:var(--r)">${peso(bal)}</b></div></div><div class="w"><table><thead><tr><th>Date</th><th>DR / Transaction</th><th>Type</th><th class="r">Charge</th><th class="r">Paid</th><th class="r">Balance</th><th>Action</th></tr></thead><tbody>${tableRows(rows)||'<tr><td colspan="7">No transactions for this account.</td></tr>'}</tbody></table></div></div>`}).join('')||'<div class="card">No accounts found for this customer.</div>'}<h3>Unmatched Customer Transactions</h3><div class="card w"><table><thead><tr><th>Date</th><th>DR / Transaction</th><th>Account on Sale</th><th>Type</th><th class="r">Amount</th><th class="r">Balance</th></tr></thead><tbody>${sales.filter(s=>!accounts.some(a=>belongs(s,a))).map(s=>`<tr><td>${esc(s.date||'—')}<td>${esc(s.dr||s.id)}<td>${esc(s.account||'—')}<td>${esc(s.mode||'—')}<td class="r">${peso(s.total||0)}<td class="r">${peso(Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0)))}</tr>`).join('')||'<tr><td colspan="6">No unmatched transactions.</td></tr>'}</tbody></table></div><p style="color:var(--m);font-size:12px">Showing up to 500 transactions for this customer. Transaction lookup uses the customer name saved on each sale.</p>`;
+ }catch(e){$('#customer-detail-content').innerHTML=`<div class="card">Unable to load customer details: ${esc(e.message)}</div>`}
+}
+async function viewAccountTransactions(customerId,accountId){
+ const c=D.find(x=>x.id===customerId);if(!c)return;
+ $('#md').innerHTML=`<div class="mbox customer-pane"><div class="detail-head"><div><span class="tag">ACCOUNT TRANSACTIONS</span><h2 id="account-trans-title" style="margin:8px 0 4px">Loading account…</h2><div style="color:var(--m)">${esc(c.name)}</div></div><button onclick="closeM()">Close</button></div><div id="account-trans-content" style="margin-top:18px">Loading transactions…</div></div>`;$('#md').classList.add('on');
+ try{
+  const [as,ss]=await Promise.all([C(`customers/${customerId}/accounts`).get(),C('sales').where('customer','==',c.name).limit(500).get()]);
+  const aDoc=as.docs.find(d=>d.id===accountId);if(!aDoc)throw new Error('Account not found.');
+  const a={id:aDoc.id,...aDoc.data()},v1=`${a.code||''} — ${a.description||''}`.toLowerCase(),v2=`${a.code||''} - ${a.description||''}`.toLowerCase();
+  const rows=ss.docs.map(d=>({id:d.id,...d.data()})).filter(s=>{const v=String(s.account||'').toLowerCase();return v===v1||v===v2||(a.code&&v.includes(String(a.code).toLowerCase()))}).sort((x,y)=>(y.date||'').localeCompare(x.date||''));
+  const charges=rows.filter(s=>s.mode==='Charge'&&!s.rev),total=charges.reduce((n,s)=>n+(s.total||0),0),paid=charges.reduce((n,s)=>n+(s.paid||0),0),bal=charges.reduce((n,s)=>n+Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0)),0);
+  $('#account-trans-title').textContent=`${a.code||''} — ${a.description||''}`;
+  $('#account-trans-content').innerHTML=`<div class="summary-grid"><div class="summary-box"><span>Transactions</span><b>${rows.length}</b></div><div class="summary-box"><span>Total Charges</span><b>${peso(total)}</b></div><div class="summary-box"><span>Total Paid</span><b>${peso(paid)}</b></div><div class="summary-box"><span>Balance Due</span><b style="color:var(--r)">${peso(bal)}</b></div></div><div class="card w"><table><thead><tr><th>Date</th><th>DR / Transaction</th><th>Mode</th><th class="r">Total</th><th class="r">Paid</th><th class="r">Balance</th><th>Actions</th></tr></thead><tbody>${rows.map(s=>`<tr><td>${esc(s.date||'—')}</td><td>${esc(s.dr||s.id)}</td><td>${esc(s.mode||'—')}</td><td class="r">${peso(s.total||0)}</td><td class="r">${peso(s.paid||0)}</td><td class="r">${peso(Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0)))}</td><td><button onclick="viewSale('${s.id}')">View items</button> <button onclick="printDR('${s.id}')">Print</button>${s.mode==='Charge'&&Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0))>0?` <button onclick="recordCustomerPayment('${s.id}')">Record Payment</button>`:''}</td></tr>`).join('')||'<tr><td colspan="7" style="text-align:center;padding:28px">No transactions recorded for this account.</td></tr>'}</tbody></table></div>`;
+ }catch(e){$('#account-trans-content').textContent='Unable to load account transactions: '+e.message}
+}
+
+async function recordCustomerPayment(id){
+ try{const ref=fs.doc('sales/'+id),snap=await ref.get();if(!snap.exists)return uiAlert('Transaction not found.');const s={id,...snap.data()},balance=Math.max(0,(s.total||0)-(s.paid||0)-(s.adj||0));if(s.mode!=='Charge'||balance<=0)return uiAlert('This transaction has no outstanding charge balance.');
+ const v=await uiPrompt(`Payment amount (₱) — Balance: ${peso(balance)}`);if(v===null)return;const amount=toC(v);if(!(amount>0)||amount>balance)return uiAlert('Enter a valid payment not exceeding the balance.');const method=await uiPrompt('Payment method (Cash / Check / Bank / GCash)','Cash');if(method===null)return;const reference=await uiPrompt('Reference / OR number (optional)')||'',date=await uiPrompt('Payment date (YYYY-MM-DD)',today())||today(),bt=fs.batch();
+ bt.set(nid('payments'),{sale:id,customer:s.customer,account:s.account||'',amount,method,ref:reference,date,by:me.uid,byName:me.name,at:TS});bt.update(ref,{paid:inc(amount),open:amount<balance});if(await send(bt,'Payment recorded successfully.'))customerDetailsByName(s.customer);
+ }catch(e){uiAlert('Unable to record payment: '+e.message)}
+}
+async function customerDetailsByName(name){const c=D.find(x=>x.name===name);if(c)customerDetails(c.id)}
+
+async function addCustomer(e){e.preventDefault();const g=id=>$('#'+id).value.trim(),name=g('cn');if(!name)return;const r=nid('customers'),data={name,contact:g('ct'),address:g('ca'),notes:g('cnotes'),active:true,by:me.uid,byName:me.name,at:TS};try{await r.set(data);C('auditLogs').add({action:'CUSTOMER_ADD',entity:'customers',eid:r.id,before:null,after:{name},reason:'Add customer',by:me.uid,byName:me.name,role:me.role,at:TS}).catch(()=>{});uiAlert('Customer added successfully.');customerCache=[];e.target.reset();}catch(err){uiAlert('Unable to add customer: '+err.message+'\nIf you see permission-denied, Firestore Security Rules must allow your role to write to the customers collection.')}}
+async function editCustomer(id){const c=D.find(x=>x.id===id);if(!c)return;const name=await uiPrompt('Customer name',c.name);if(name===null)return;const contact=await uiPrompt('Contact number',c.contact||'');if(contact===null)return;const address=await uiPrompt('Address',c.address||'');if(address===null)return;const why=await uiPrompt('Reason for editing');if(!why)return;const bt=fs.batch();bt.update(fs.doc('customers/'+id),{name:name.trim(),contact,address});aud(bt,'CUSTOMER_EDIT','customers',id,{name:c.name,contact:c.contact||'',address:c.address||''},{name:name.trim(),contact,address},why);send(bt,'Customer updated successfully.')}
+async function deleteCustomer(id){const c=D.find(x=>x.id===id);if(!c)return;if(!await uiConfirm(`I-archive si ${c.name}?`))return;const why=await uiPrompt('Reason (required)');if(!why)return;const bt=fs.batch();bt.update(fs.doc('customers/'+id),{active:false,deletedAt:TS,deletedBy:me.uid});aud(bt,'CUSTOMER_DELETE','customers',id,{active:true},{active:false},why);send(bt,'Customer archived successfully.')}
+async function manageAccounts(id){const c=D.find(x=>x.id===id);if(!c)return;$('#md').innerHTML=`<div class="mbox">${mh('s','CUSTOMER ACCOUNTS')}<h3>${esc(c.name)}</h3><form class="f" onsubmit="addAccount(event,'${id}')"><label>Code<input id="acode" required></label><label>Description<input id="adesc" required></label><label>Total ₱<input id="atotal" type="number" min="0" step="0.01" value="0" required></label><label>&nbsp;<button class="p">+ Add account</button></label></form><div id="accounts">Loading accounts…</div></div>`;$('#md').classList.add('on');loadAccounts(id)}
+async function loadAccounts(id){try{const s=await C('customers/'+id+'/accounts').get();const a=s.docs.map(d=>({id:d.id,...d.data()}));$('#accounts').innerHTML=`<table><thead><tr><th>Code<th>Description<th class="r">Total<th>Actions</tr></thead><tbody>${a.map(x=>`<tr><td>${esc(x.code)}<td>${esc(x.description)}<td class="r">${peso(x.total||0)}<td><button onclick="editAccount('${id}','${x.id}')">Edit</button> <button onclick="deleteAccount('${id}','${x.id}')">Delete</button></tr>`).join('')||'<tr><td colspan="4">No accounts found.</td></tr>'}</tbody></table>`}catch(e){$('#accounts').textContent='Error: '+e.message}}
+async function addAccount(e,id){e.preventDefault();const g=x=>$('#'+x).value.trim(),r=nid('customers/'+id+'/accounts'),bt=fs.batch(),data={code:g('acode'),description:g('adesc'),total:toC(g('atotal')),by:me.uid,byName:me.name,at:TS};bt.set(r,data);aud(bt,'CUSTOMER_ACCOUNT_ADD','customers/'+id+'/accounts',r.id,null,data,'Add customer account');if(await send(bt,'Account added successfully.')){e.target.reset();loadAccounts(id)}}
+async function editAccount(cid,aid){const ref=fs.doc(`customers/${cid}/accounts/${aid}`),s=await ref.get();if(!s.exists)return;const a=s.data(),code=await uiPrompt('Code',a.code);if(code===null)return;const description=await uiPrompt('Description',a.description);if(description===null)return;const total=await uiPrompt('Total ₱',pe(a.total||0));if(total===null)return;const why=await uiPrompt('Reason (required)');if(!why)return;const after={code,description,total:toC(total)};const bt=fs.batch();bt.update(ref,after);aud(bt,'CUSTOMER_ACCOUNT_EDIT','customers/'+cid+'/accounts',aid,a,after,why);if(await send(bt,'Account updated successfully.'))loadAccounts(cid)}
+async function deleteAccount(cid,aid){if(!await uiConfirm('Archive this account?'))return;const why=await uiPrompt('Reason (required)');if(!why)return;const ref=fs.doc(`customers/${cid}/accounts/${aid}`),bt=fs.batch();bt.update(ref,{active:false,deletedAt:TS,deleteReason:why});aud(bt,'CUSTOMER_ACCOUNT_DELETE','customers/'+cid+'/accounts',aid,{active:true},{active:false},why);if(await send(bt,'Account archived successfully.'))loadAccounts(cid)}
+function restocks(){return `<h2>Restock Records <small>pinakabagong 200 · delete = reversal sa ledger</small></h2><div class="card w"><input id="q" placeholder="Search supplier / reference" oninput="filt()"><table><thead><tr><th>Date<th>Supplier<th>Reference<th class="r">Total<th>By<th>Actions</tr></thead><tbody id="tb">${D.map(r=>`<tr><td>${esc(r.date)}<td>${esc(r.supplier)}<td>${esc(r.ref||'')}<td class="r">${peso(r.total||0)}<td>${esc(r.byName||'')}<td>${r.reversed?'<span class="tag no">REVERSED</span>':`<button onclick="reverseRestock('${r.id}')">Delete / Reverse</button>`}</tr>`).join('')}</tbody></table></div>`}
+async function reverseRestock(id){const r=D.find(x=>x.id===id);if(!r||r.reversed)return;const why=await uiPrompt(`Reverse restock from ${r.supplier} for ${peso(r.total||0)}? Reason (required):`);if(!why)return;if(!await uiConfirm('This will add reversal entries to the stock ledger; the history will not be deleted. Continue?'))return;const bt=fs.batch(),date=today();
+ r.lines.forEach(l=>{bt.set(nid('movements'),{pid:l.pid,qty:-l.qty,type:'RESTOCK_REVERSAL',ref:id,date,by:me.uid,byName:me.name,cost:l.landedUnit||l.cost||0,reason:why,at:TS});bt.update(fs.doc('products/'+l.pid),{stock:inc(-l.qty)});if(l.oldCost!==undefined){bt.update(fs.doc('products/'+l.pid),{cost:l.oldCost});bt.set(nid('priceHistory'),{pid:l.pid,type:'COST',old:P[l.pid]?.cost||0,new:l.oldCost,src:'Restock reversal',ref:id,reason:why,by:me.uid,byName:me.name,at:TS})}if(l.np!==null&&l.np!==undefined&&l.oldPrice!==undefined){bt.update(fs.doc('products/'+l.pid),{price:l.oldPrice});bt.set(nid('priceHistory'),{pid:l.pid,type:'SELLING',old:P[l.pid]?.price||0,new:l.oldPrice,src:'Restock reversal',ref:id,reason:why,by:me.uid,byName:me.name,at:TS})}});
+ bt.update(fs.doc('restocks/'+id),{reversed:true,reversedAt:TS,reversedBy:me.uid,reversedByName:me.name,reversalReason:why});aud(bt,'RESTOCK_REVERSE','restocks',id,{reversed:false},{reversed:true},why);send(bt,'Na-reverse ang restock; naitala ang rollback sa ledger.')}
 function recv(){
   const tb=D.reduce((a,s)=>a+s.total-s.paid-(s.adj||0),0);
-  return `<h2>Receivables <small>Open balance ${peso(tb)} (mga hindi pa bayad lang)</small></h2><div class="card w"><input id="q" placeholder="Search…" oninput="filt()" style="margin-bottom:8px"><table><thead><tr><th>Date<th>DR<th>Customer<th class="r">Amount<th class="r">Paid<th class="r">Balance<th>Status<th></tr></thead><tbody id="tb">${D.map(s=>`<tr><td>${esc(s.date)}<td>${esc(s.dr)}<td>${esc(s.customer)}<td class="r">${peso(s.total)}<td class="r">${peso(s.paid)}<td class="r">${peso(s.total-s.paid-(s.adj||0))}<td><span class="tag ${s.paid?'lo':'no'}">${s.paid?'Partial':'Unpaid'}</span>${s._p?' <span class="tag">pending</span>':''}<td><button onclick="pay('${s.id}')">Record payment</button> <button onclick="hist('${s.id}')">History</button></tr>`).join('')}</tbody></table></div>`;
+  return `<h2>Receivables <small>Open balance ${peso(tb)} (unpaid balances only)</small></h2><div class="card w"><input id="q" placeholder="Search…" oninput="filt()" style="margin-bottom:8px"><table><thead><tr><th>Date<th>DR<th>Customer<th class="r">Amount<th class="r">Paid<th class="r">Balance<th>Status<th></tr></thead><tbody id="tb">${D.map(s=>`<tr><td>${esc(s.date)}<td>${esc(s.dr)}<td>${esc(s.customer)}<td class="r">${peso(s.total)}<td class="r">${peso(s.paid)}<td class="r">${peso(s.total-s.paid-(s.adj||0))}<td><span class="tag ${s.paid?'lo':'no'}">${s.paid?'Partial':'Unpaid'}</span>${s._p?' <span class="tag">pending</span>':''}<td><button onclick="pay('${s.id}')">Record payment</button> <button onclick="hist('${s.id}')">History</button></tr>`).join('')}</tbody></table></div>`;
 }
 async function pay(id){
-  const s=D.find(x=>x.id===id),b=s.total-s.paid-(s.adj||0),v=prompt(`Payment amount ₱ (balance ${peso(b)})`);if(v===null)return;
-  const a=toC(v);if(!(a>0)||a>b)return alert('Invalid amount o lampas sa balance.');
-  const m=prompt('Method (Cash/Check/Bank/GCash)','Cash')||'Cash',ref=prompt('Reference / OR no. (optional)')||'',bt=fs.batch();
+  const s=D.find(x=>x.id===id),b=s.total-s.paid-(s.adj||0),v=await uiPrompt(`Payment amount ₱ (balance ${peso(b)})`);if(v===null)return;
+  const a=toC(v);if(!(a>0)||a>b)return uiAlert('Invalid amount o lampas sa balance.');
+  const m=await uiPrompt('Method (Cash/Check/Bank/GCash)','Cash')||'Cash',ref=await uiPrompt('Reference / OR no. (optional)')||'',bt=fs.batch();
   bt.set(nid('payments'),{sale:id,customer:s.customer,amount:a,method:m,ref,date:today(),by:me.uid,byName:me.name,at:TS});
   bt.update(fs.doc('sales/'+id),{paid:inc(a),open:a<b});send(bt,'Na-record ang bayad.');
 }
-async function hist(id){const s=await C('payments').where('sale','==',id).get();alert(s.docs.map(d=>d.data()).sort((x,y)=>x.date<y.date?-1:1).map(p=>`${p.date}  ${peso(p.amount)}  ${p.method} ${p.ref||''}  (${p.byName})`).join('\n')||'Wala pang bayad.')}
+async function hist(id){const s=await C('payments').where('sale','==',id).get();uiAlert(s.docs.map(d=>d.data()).sort((x,y)=>x.date<y.date?-1:1).map(p=>`${p.date}  ${peso(p.amount)}  ${p.method} ${p.ref||''}  (${p.byName})`).join('\n')||'No payments recorded.')}
 function borrow(){
   const rows=[];D.slice().sort((a,b)=>a.date<b.date?1:-1).forEach(s=>s.lines.forEach(l=>rows.push([s,l,(s.ret||{})[l.pid]||0])));
-  return `<h2>Borrowed Items <small>mga bukas pa lang</small></h2><div class="card w"><input id="q" placeholder="Search…" oninput="filt()" style="margin-bottom:8px"><table><thead><tr><th>Date<th>DR<th>Borrower<th>Item<th class="r">Borrowed<th class="r">Returned<th class="r">Outstanding<th></tr></thead><tbody id="tb">${rows.map(([s,l,r])=>`<tr><td>${esc(s.date)}<td>${esc(s.dr)}<td>${esc(s.customer)}<td>${esc(l.name)}<td class="r">${l.qty}<td class="r">${r}<td class="r">${l.qty-r}<td>${l.qty-r>0?`<button onclick="retB('${s.id}','${l.pid}')">Return</button>`:'<span class="tag ok">Returned</span>'}</tr>`).join('')}</tbody></table></div>`;
+  return `<h2>Borrowed Items <small>open transactions only</small></h2><div class="card w"><input id="q" placeholder="Search…" oninput="filt()" style="margin-bottom:8px"><table><thead><tr><th>Date<th>DR<th>Borrower<th>Item<th class="r">Borrowed<th class="r">Returned<th class="r">Outstanding<th></tr></thead><tbody id="tb">${rows.map(([s,l,r])=>`<tr><td>${esc(s.date)}<td>${esc(s.dr)}<td>${esc(s.customer)}<td>${esc(l.name)}<td class="r">${l.qty}<td class="r">${r}<td class="r">${l.qty-r}<td>${l.qty-r>0?`<button onclick="retB('${s.id}','${l.pid}')">Return</button>`:'<span class="tag ok">Returned</span>'}</tr>`).join('')}</tbody></table></div>`;
 }
 async function retB(sid,pid){
-  const s=D.find(x=>x.id===sid),l=s.lines.find(x=>x.pid===pid),out=l.qty-((s.ret||{})[pid]||0),v=parseInt(prompt(`Ilan ang isinauli? (outstanding ${out})`));
-  if(!(v>0)||v>out)return alert('Invalid qty.');
+  const s=D.find(x=>x.id===sid),l=s.lines.find(x=>x.pid===pid),out=l.qty-((s.ret||{})[pid]||0),v=parseInt(await uiPrompt(`Ilan ang isinauli? (outstanding ${out})`));
+  if(!(v>0)||v>out)return uiAlert('Invalid qty.');
   const date=today(),left=s.lines.reduce((a,x)=>a+x.qty-((s.ret||{})[x.pid]||0),0)-v,bt=fs.batch();
   bt.set(nid('borrowReturns'),{sale:sid,pid,qty:v,date,by:me.uid,byName:me.name,at:TS});
   bt.set(nid('movements'),{pid,qty:v,type:'BORROW_RETURN',ref:sid,date,by:me.uid,byName:me.name,cost:l.cost,at:TS});
@@ -318,14 +618,14 @@ const expStock=()=>csv([['Item','SKU','Unit','Stock','Restock level','Avg cost',
 function openRet(id){
   const s=D.find(x=>x.id===id);K='t';
   $('#md').innerHTML=`<div class="mbox">${mh('s','SALES RETURN')}<p>DR ${esc(s.dr)} · ${esc(s.customer)}</p><div class="w"><table class="mt s"><thead><tr><th>Item<th>Sold<th>Nai-return na<th>Return qty<th>Resalable</tr></thead><tbody>${s.lines.map((l,i)=>`<tr><td style="padding:6px">${esc(l.name)}<td class="r">${l.qty}<td class="r">${(s.rtn||{})[l.pid]||0}<td><input type="number" min="0" step="1" value="0" id="rq${i}"><td style="text-align:center"><input type="checkbox" id="rz${i}" checked style="width:auto"></tr>`).join('')}</tbody></table></div>
-  <input id="rt_reason" placeholder="Reason (required)" style="width:100%;margin:10px 0"><p style="color:var(--m);font-size:12px">Ang hindi resalable ay hindi madadagdag sa stock.</p><button style="background:#8e7cc3;color:#fff" onclick="postRet('${id}')">Add Record</button></div>`;
+  <input id="rt_reason" placeholder="Reason (required)" style="width:100%;margin:10px 0"><p style="color:var(--m);font-size:12px">Items that are not resalable will not be added back to stock.</p><button style="background:#8e7cc3;color:#fff" onclick="postRet('${id}')">Add Record</button></div>`;
   $('#md').classList.add('on');
 }
 async function postRet(id){
   const s=D.find(x=>x.id===id),reason=$('#rt_reason').value.trim();
   const ls=s.lines.map((l,i)=>({...l,q:parseInt($('#rq'+i).value)||0,res:$('#rz'+i).checked})).filter(l=>l.q>0);
-  if(!ls.length)return alert('Maglagay ng return qty.');if(!reason)return alert('Reason ang kailangan.');
-  if(ls.some(l=>l.q>l.qty-((s.rtn||{})[l.pid]||0)))return alert('Lampas sa maibabalik na qty.');
+  if(!ls.length)return uiAlert('Maglagay ng return qty.');if(!reason)return uiAlert('A reason is required.');
+  if(ls.some(l=>l.q>l.qty-((s.rtn||{})[l.pid]||0)))return uiAlert('Lampas sa maibabalik na qty.');
   const amt=ls.reduce((a,l)=>a+l.q*l.price,0),cg=ls.filter(l=>l.res).reduce((a,l)=>a+l.q*l.cost,0),bt=fs.batch(),date=today(),r=nid('returns');
   bt.set(r,{sale:id,dr:s.dr,customer:s.customer,date,lines:ls.map(l=>({pid:l.pid,name:l.name,qty:l.q,price:l.price,cost:l.cost,resalable:l.res})),amount:amt,cogs:cg,reason,by:me.uid,byName:me.name,at:TS});
   const up={adj:inc(amt)};ls.forEach(l=>up['rtn.'+l.pid]=inc(l.q));
@@ -338,15 +638,15 @@ async function postRet(id){
 /* ---------- physical count ---------- */
 function count(){
   if(me.role==='encoder')return '<h2>Physical Count</h2><div class="card">Admin lang ang may access.</div>';
-  return `<h2>Physical Count</h2><div class="card w"><p style="color:var(--m);margin-top:0">Ilagay ang aktwal na bilang. Ang pagkakaiba laban sa system stock (sa oras na binuksan ang page) ay ipo-post bilang adjustment sa ledger. Iwanang blangko ang hindi binilang.</p><table><thead><tr><th>Item<th class="r">System stock<th>Counted<th class="r">Variance<th class="r">Cost impact</tr></thead><tbody>${ids().map(i=>`<tr><td>${esc(P[i].name)}<td class="r">${stk(i)}<td><input type="number" step="1" id="c_${i}" data-s="${stk(i)}" oninput="cv('${i}')" style="width:100px"><td class="r" id="v_${i}"><td class="r" id="x_${i}"></tr>`).join('')}</tbody></table><p><input id="c_reason" placeholder="Reason / count notes" style="width:60%"> <button class="p" onclick="postCount()">Post adjustments</button></p></div>`;
+  return `<h2>Physical Count</h2><div class="card w"><p style="color:var(--m);margin-top:0">Enter the actual count. Differences from system stock (when this page was opened) will be posted as ledger adjustments. Leave uncounted items blank.</p><table><thead><tr><th>Item<th class="r">System stock<th>Counted<th class="r">Variance<th class="r">Cost impact</tr></thead><tbody>${ids().map(i=>`<tr><td>${esc(P[i].name)}<td class="r">${stk(i)}<td><input type="number" step="1" id="c_${i}" data-s="${stk(i)}" oninput="cv('${i}')" style="width:100px"><td class="r" id="v_${i}"><td class="r" id="x_${i}"></tr>`).join('')}</tbody></table><p><input id="c_reason" placeholder="Reason / count notes" style="width:60%"> <button class="p" onclick="postCount()">Post adjustments</button></p></div>`;
 }
 function cv(i){const e=$('#c_'+i),v=e.value===''?null:parseInt(e.value)-parseInt(e.dataset.s);$('#v_'+i).textContent=v===null||isNaN(v)?'':v;$('#x_'+i).textContent=v?peso(v*(P[i].cost||0)):''}
 async function postCount(){
   const reason=$('#c_reason').value.trim(),ls=ids().map(i=>{const e=$('#c_'+i);return e.value===''?null:{pid:i,name:P[i].name,sys:parseInt(e.dataset.s),counted:parseInt(e.value)}}).filter(Boolean);
-  if(!ls.length)return alert('Walang bilang.');if(ls.some(l=>!(l.counted>=0)))return alert('Invalid count.');
+  if(!ls.length)return uiAlert('No counts entered.');if(ls.some(l=>!(l.counted>=0)))return uiAlert('Invalid count.');
   ls.forEach(l=>l.v=l.counted-l.sys);const df=ls.filter(l=>l.v);
-  if(!df.length)return alert('Walang pagkakaiba.');if(!reason)return alert('Reason ang kailangan.');
-  if(!confirm(`I-post ang ${df.length} adjustment?`))return;
+  if(!df.length)return uiAlert('No variances found.');if(!reason)return uiAlert('A reason is required.');
+  if(!await uiConfirm(`I-post ang ${df.length} adjustment?`))return;
   const bt=fs.batch(),date=today(),r=nid('stockCounts');
   bt.set(r,{date,reason,lines:ls,by:me.uid,byName:me.name,at:TS});
   df.forEach(l=>{bt.set(nid('movements'),{pid:l.pid,qty:l.v,type:'ADJUSTMENT',ref:r.id,date,by:me.uid,byName:me.name,cost:P[l.pid].cost||0,reason,at:TS});bt.update(fs.doc('products/'+l.pid),{stock:inc(l.v)})});
@@ -358,7 +658,7 @@ async function postCount(){
 function reports(){
   const t=today();
   return `<h2>Reports</h2><div class="card"><div class="f"><label>From<input id="g_from" type="date" value="${t.slice(0,8)}01"></label><label>To<input id="g_to" type="date" value="${t}"></label><label>&nbsp;<button class="p" onclick="runRep()">Run</button></label></div><div id="rep" class="w"></div></div>
-  <div class="card"><b>Inventory valuation (avg cost, hindi kasama ang negative stock):</b> ${peso(ids().reduce((a,i)=>a+Math.max(0,stk(i))*(P[i].cost||0),0))}</div>`;
+  <div class="card"><b>Inventory valuation (average cost, excluding negative stock):</b> ${peso(ids().reduce((a,i)=>a+Math.max(0,stk(i))*(P[i].cost||0),0))}</div>`;
 }
 async function runRep(){
   const f=$('#g_from').value,t=$('#g_to').value,q=n=>C(n).where('date','>=',f).where('date','<=',t).get();
@@ -368,7 +668,7 @@ async function runRep(){
     s.forEach(d=>{const x=d.data();if(x.rev)return;const c=x.lines.reduce((a,l)=>a+l.qty*l.cost,0);if(x.mode==='Lost')lost+=c;else if(x.mode==='Borrow')bor++;else{rev+=x.total;cogs+=c;col[x.mode]+=x.total}});
     let rr=0,rc=0;r.forEach(d=>{rr+=d.data().amount;rc+=d.data().cogs});
     const gp=rev-rr-(cogs-rc),row=(a,b,bold)=>`<tr><td>${bold?'<b>'+a+'</b>':a}<td class="r">${bold?'<b>'+b+'</b>':b}</tr>`;
-    $('#rep').innerHTML=`<table>${row('Cash',peso(col.Cash))}${row('Check',peso(col.Check))}${row('Charge',peso(col.Charge))}${row('Gross sales',peso(rev))}${row('Less: returns',peso(rr))}${row('Net sales',peso(rev-rr))}${row('COGS (weighted avg cost snapshot, net of resalable returns)',peso(cogs-rc))}${row('Gross profit',peso(gp)+(rev-rr?' · '+(gp/(rev-rr)*100).toFixed(1)+'%':''),1)}${row('Inventory losses (Lost, at cost; hiwalay sa profit)',peso(lost))}${row('Borrow transactions (hindi sales)',bor)}</table><small style="color:var(--m)">Operational estimate: gumagamit ng cost snapshot sa oras ng benta. Mali ang cost kung may negative stock noon.</small>`;
+    $('#rep').innerHTML=`<table>${row('Cash',peso(col.Cash))}${row('Check',peso(col.Check))}${row('Charge',peso(col.Charge))}${row('Gross sales',peso(rev))}${row('Less: returns',peso(rr))}${row('Net sales',peso(rev-rr))}${row('COGS (weighted avg cost snapshot, net of resalable returns)',peso(cogs-rc))}${row('Gross profit',peso(gp)+(rev-rr?' · '+(gp/(rev-rr)*100).toFixed(1)+'%':''),1)}${row('Inventory losses (Lost, at cost; excluded from profit)',peso(lost))}${row('Borrow transactions (not sales)',bor)}</table><small style="color:var(--m)">Operational estimate: uses the cost snapshot at the time of sale. Cost may be inaccurate if stock was negative at that time.</small>`;
   }catch(e){$('#rep').textContent='Error: '+e.message}
 }
 function ledger(){
@@ -378,35 +678,35 @@ function ledger(){
 /* ---------- void (reversal), reconcile, conflicts, audit ---------- */
 async function voidSale(id){
   const s=D.find(x=>x.id===id);
-  if(s.paid>0||s.adj||Object.values(s.ret||{}).some(v=>v>0))return alert('Hindi pwedeng i-void: may bayad, return o sauli na.');
-  const why=prompt(`I-void ang DR ${s.dr} (${peso(s.total)})? Reason (kailangan):`);if(!why)return;
+  if(s.paid>0||s.adj||Object.values(s.ret||{}).some(v=>v>0))return uiAlert('Cannot void: a payment or return has already been recorded.');
+  const why=await uiPrompt(`I-void ang DR ${s.dr} (${peso(s.total)})? Reason (required):`);if(!why)return;
   const bt=fs.batch(),date=today();
   s.lines.forEach(l=>{bt.set(nid('movements'),{pid:l.pid,qty:l.qty,type:'REVERSAL',ref:id,date,by:me.uid,byName:me.name,cost:l.cost,reason:why,at:TS});bt.update(fs.doc('products/'+l.pid),{stock:inc(l.qty)})});
   bt.update(fs.doc('sales/'+id),{rev:{by:me.uid,byName:me.name,reason:why,date},open:false,borrowOpen:false});
   aud(bt,'SALE_VOID','sales',id,{dr:s.dr,total:s.total},{voided:true},why);send(bt,'Na-void ang benta (nagawa ang reversal sa ledger).');
 }
 async function reconcile(){
-  if(!navigator.onLine)return alert('Kailangan ng internet.');
-  if(!confirm('Babasahin ang buong ledger (maraming reads sa Spark quota). Ituloy?'))return;
+  if(!navigator.onLine)return uiAlert('Kailangan ng internet.');
+  if(!await uiConfirm('Babasahin ang buong ledger (maraming reads sa Spark quota). Continue?'))return;
   try{
     const s=await C('movements').get({source:'server'}),sum={};s.forEach(d=>{const m=d.data();sum[m.pid]=(sum[m.pid]||0)+m.qty});
-    const bad=ids().filter(i=>(sum[i]||0)!==stk(i));if(!bad.length)return alert('Tugma ang lahat ng stock sa ledger.');
-    if(!confirm(bad.map(i=>`${P[i].name}: stock ${stk(i)}, ledger ${sum[i]||0}`).join('\n')+'\n\nI-set ang stock ayon sa ledger?'))return;
+    const bad=ids().filter(i=>(sum[i]||0)!==stk(i));if(!bad.length)return uiAlert('Tugma ang lahat ng stock sa ledger.');
+    if(!await uiConfirm(bad.map(i=>`${P[i].name}: stock ${stk(i)}, ledger ${sum[i]||0}`).join('\n')+'\n\nI-set ang stock ayon sa ledger?'))return;
     const bt=fs.batch();bad.forEach(i=>{bt.update(fs.doc('products/'+i),{stock:sum[i]||0});aud(bt,'RECONCILE','products',i,{stock:stk(i)},{stock:sum[i]||0},'Ledger reconcile')});send(bt,'Na-reconcile.');
-  }catch(e){alert(e.message)}
+  }catch(e){uiAlert(e.message)}
 }
 function conflicts(){
   const adm=me.role!=='encoder',l=D.slice().sort((a,b)=>(b.at?.seconds??9e9)-(a.at?.seconds??9e9));
-  return `<h2>Sync Conflicts</h2><div class="card w"><p style="margin-top:0;color:var(--m)">Mga offline na transaksyon na hindi tinanggap ng server. Walang tahimik na pag-overwrite: i-review, i-re-enter nang tama, at i-resolve.</p><table><thead><tr><th>Date<th>Transaction<th>Reason<th>By<th>Status<th></tr></thead><tbody>${l.map(c=>`<tr><td>${fmt(c.at)}<td>${esc(c.label)}<td>${esc(c.error)}<td>${esc(c.byName)}<td><span class="tag ${c.status==='OPEN'?'no':'ok'}">${c.status}</span>${c.resolution?'<br><small>'+esc(c.resolution)+' — '+esc(c.reason)+' ('+esc(c.resolvedByName)+')</small>':''}<td>${c.kind==='sales'&&c.payload&&c.status==='OPEN'?`<button onclick="reenter('${c.id}')">Re-enter</button> `:''}${adm&&c.status==='OPEN'?`<button onclick="resolveC('${c.id}')">Resolve</button>`:''}</tr>`).join('')||'<tr><td colspan=6>Walang conflict.</tr>'}</tbody></table></div>`;
+  return `<h2>Sync Conflicts</h2><div class="card w"><p style="margin-top:0;color:var(--m)">Offline transactions rejected by the server. No silent overwrites: review, re-enter correctly, and resolve.</p><table><thead><tr><th>Date<th>Transaction<th>Reason<th>By<th>Status<th></tr></thead><tbody>${l.map(c=>`<tr><td>${fmt(c.at)}<td>${esc(c.label)}<td>${esc(c.error)}<td>${esc(c.byName)}<td><span class="tag ${c.status==='OPEN'?'no':'ok'}">${c.status}</span>${c.resolution?'<br><small>'+esc(c.resolution)+' — '+esc(c.reason)+' ('+esc(c.resolvedByName)+')</small>':''}<td>${c.kind==='sales'&&c.payload&&c.status==='OPEN'?`<button onclick="reenter('${c.id}')">Re-enter</button> `:''}${adm&&c.status==='OPEN'?`<button onclick="resolveC('${c.id}')">Resolve</button>`:''}</tr>`).join('')||'<tr><td colspan=6>No conflicts.</tr>'}</tbody></table></div>`;
 }
 function reenter(id){
-  const p=JSON.parse(D.find(x=>x.id===id).payload),ok=p.lines.filter(l=>P[l.pid]);if(ok.length<p.lines.length)alert('May product na wala na; hindi isasama.');
+  const p=JSON.parse(D.find(x=>x.id===id).payload),ok=p.lines.filter(l=>P[l.pid]);if(ok.length<p.lines.length)uiAlert('Some products no longer exist and will be excluded.');
   openM('s');const m={s_date:'date',s_cust:'customer',s_acc:'account',s_mode:'mode',s_dr:'dr',s_po:'po',s_si:'si',s_notes:'notes'};
   Object.keys(m).forEach(k=>$('#'+k).value=p[m[k]]||'');
   R=blank(Math.max(10,ok.length)).map((r,i)=>ok[i]?{pid:ok[i].pid,qty:ok[i].qty,price:pe(ok[i].price),np:''}:r);drawRows();
 }
-function resolveC(id){
-  const a=prompt('Resolution (hal. "Re-entered as new sale", "Rejected"):');if(!a)return;const r=prompt('Reason (kailangan):');if(!r)return;
+async function resolveC(id){
+  const a=await uiPrompt('Resolution (e.g. "Re-entered as new sale", "Rejected"): ');if(!a)return;const r=await uiPrompt('Reason (required):');if(!r)return;
   const bt=fs.batch();bt.update(fs.doc('syncConflicts/'+id),{status:'RESOLVED',resolution:a,reason:r,resolvedBy:me.uid,resolvedByName:me.name,resolvedAt:TS});
   aud(bt,'CONFLICT_RESOLVE','syncConflicts',id,{status:'OPEN'},{status:'RESOLVED',resolution:a},r);send(bt,'Resolved.');
 }
@@ -414,7 +714,62 @@ function audit(){
   if(me.role==='encoder')return '<h2>Audit Log</h2><div class="card">Admin lang ang may access.</div>';
   return `<h2>Audit Log <small>pinakabagong 200</small></h2><div class="card w"><input id="q" placeholder="Search…" oninput="filt()" style="margin-bottom:8px"><table><thead><tr><th>Date<th>Who<th>Action<th>Record<th>Before → After<th>Reason</tr></thead><tbody id="tb">${D.map(a=>`<tr><td>${fmt(a.at)}<td>${esc(a.byName)} (${esc(a.role)})<td>${esc(a.action)}<td>${esc(a.entity)}/${esc(String(a.eid||'').slice(0,6))}<td><small>${esc(JSON.stringify(a.before))} → ${esc(JSON.stringify(a.after))}</small><td>${esc(a.reason)}</tr>`).join('')}</tbody></table></div>`;
 }
-function toggleU(u,v){const bt=fs.batch();bt.update(fs.doc('users/'+u),{active:v});aud(bt,v?'USER_ENABLE':'USER_DISABLE','users',u,{active:!v},{active:v},'');bt.commit().catch(x=>alert(x.message))}
+function toggleU(u,v){const bt=fs.batch();bt.update(fs.doc('users/'+u),{active:v});aud(bt,v?'USER_ENABLE':'USER_DISABLE','users',u,{active:!v},{active:v},'');bt.commit().catch(x=>uiAlert(x.message))}
+
+/* ---------- product CSV template + import ---------- */
+let IMP=[],IMPFN='';
+const expTpl=()=>csv([['Name','SKU','Unit','Opening Stock','Cost','Price','Restock Level'],['Sample: Hammer 16oz (burahin ang row na ito)','HM-16','pc',24,150,225,5]],'product-template');
+function csvParse(t){
+  t=t.replace(/^\ufeff/,'');const rows=[];let r=[],c='',q=false;
+  for(let i=0;i<t.length;i++){const ch=t[i];
+    if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
+    else if(ch==='"')q=true;
+    else if(ch===','){r.push(c);c=''}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';rows.push(r);r=[]}
+    else c+=ch}
+  if(c!==''||r.length){r.push(c);rows.push(r)}
+  return rows.filter(x=>x.some(v=>v.trim()!==''));
+}
+function impFile(inp){const f=inp.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{inp.value='';prepImport(csvParse(String(fr.result)),f.name)};fr.readAsText(f)}
+function prepImport(rows,fn){
+  const norm=s=>String(s).toLowerCase().replace(/[^a-z0-9]/g,''),al={name:'name',item:'name',itemname:'name',sku:'sku',code:'sku',productcode:'sku',unit:'unit',uom:'unit',openingstock:'stock',stock:'stock',cost:'cost',basecost:'cost',baseprice:'cost',price:'price',sellingprice:'price',restocklevel:'level',level:'level',reorderlevel:'level'};
+  if(!rows.length)return uiAlert('The file is empty.');
+  const h=rows[0].map(x=>al[norm(x)]||'');if(!h.includes('name'))return uiAlert('Missing "Name" column. Download and use the template.');
+  if(rows.length<2)return uiAlert('No data rows found.');
+  const skus=new Set(Object.values(P).map(p=>(p.sku||'').toLowerCase()).filter(Boolean)),names=new Set(Object.values(P).map(p=>p.name.toLowerCase())),sS=new Set(),sN=new Set();
+  const num=v=>{v=String(v??'').replace(/[₱,\s]/g,'');return v===''?0:Number(v)};
+  IMP=rows.slice(1).map((r,i)=>{
+    const o={line:i+2};h.forEach((k,j)=>{if(k)o[k]=(r[j]??'').trim()});
+    o.name=o.name||'';o.sku=o.sku||'';o.unit=o.unit||'pc';o.stock=num(o.stock);o.cost=num(o.cost);o.price=num(o.price);o.level=num(o.level);
+    const nl=o.name.toLowerCase(),sl=o.sku.toLowerCase();
+    o.err=!o.name?'Name is required':[o.stock,o.level].some(v=>!Number.isInteger(v)||v<0)?'Stock/Level must be a whole number ≥ 0':[o.cost,o.price].some(v=>!isFinite(v)||v<0)?'Invalid cost/price':sl&&(skus.has(sl)||sS.has(sl))?'Duplicate SKU':(names.has(nl)||sN.has(nl))?'Duplicate name':'';
+    if(!o.err){if(sl)sS.add(sl);sN.add(nl)}return o});
+  IMPFN=fn;K='i';const bad=IMP.filter(x=>x.err).length,ok=IMP.length-bad;
+  $('#md').innerHTML=`<div class="mbox">${mh('s','IMPORT PRODUCTS')}<p>${esc(fn)} · <b>${ok}</b> valid, <b style="color:var(--r)">${bad}</b> with errors (will be skipped)${IMP.length>500?' · showing the first 500 rows only':''}</p>
+  <div class="w" style="max-height:55vh;overflow:auto"><table><thead><tr><th>Row<th>Name<th>SKU<th>Unit<th class="r">Stock<th class="r">Cost<th class="r">Price<th class="r">Level<th>Status</tr></thead><tbody>${IMP.slice(0,500).map(x=>`<tr><td>${x.line}<td>${esc(x.name)}<td>${esc(x.sku)}<td>${esc(x.unit)}<td class="r">${isNaN(x.stock)?'?':x.stock}<td class="r">${isNaN(x.cost)?'?':x.cost.toFixed(2)}<td class="r">${isNaN(x.price)?'?':x.price.toFixed(2)}<td class="r">${isNaN(x.level)?'?':x.level}<td>${x.err?`<span class="tag no">${x.err}</span>`:'<span class="tag ok">OK</span>'}</tr>`).join('')}</tbody></table></div>
+  <p><button onclick="closeM()">Cancel</button> <button class="p" id="ib" ${ok?'':'disabled'} onclick="doImport()">Import ${ok} product</button></p></div>`;
+  $('#md').classList.add('on');
+}
+async function doImport(){
+  const ok=IMP.filter(x=>!x.err);if(!ok.length)return;if(!await uiConfirm(`I-import ang ${ok.length} product?`))return;
+  $('#ib').disabled=true;const date=today();let n=0;
+  try{
+    for(let i=0;i<ok.length;i+=100){
+      const ch=ok.slice(i,i+100),bt=fs.batch();
+      ch.forEach(x=>{
+        const r=nid('products'),cost=toC(x.cost),price=toC(x.price);
+        bt.set(r,{name:x.name,sku:x.sku,unit:x.unit,restock:x.level,price,cost,stock:x.stock,active:true,by:me.uid,at:TS});
+        if(cost>0)bt.set(nid('priceHistory'),{pid:r.id,type:'COST',old:0,new:cost,src:'Import',by:me.uid,byName:me.name,at:TS});
+        if(price>0)bt.set(nid('priceHistory'),{pid:r.id,type:'SELLING',old:0,new:price,src:'Import',by:me.uid,byName:me.name,at:TS});
+        if(x.stock>0)bt.set(nid('movements'),{pid:r.id,qty:x.stock,type:'OPENING',ref:r.id,date,by:me.uid,byName:me.name,cost,at:TS});
+      });
+      aud(bt,'PRODUCT_IMPORT','products','batch',null,{count:ch.length},IMPFN);
+      const p=bt.commit();if(navigator.onLine)await p;else p.catch(e=>uiAlert('Na-reject ng server: '+e.message));
+      n+=ch.length;
+    }
+    uiAlert(navigator.onLine?`Imported ${n} product(s).`:'Saved offline; sync pending.');closeM();
+  }catch(e){uiAlert(`Na-import ang ${n} product bago nag-error: ${e.message}. Buksan ulit ang import para sa natitira (mamarkahan na duplicate ang na-import na).`);closeM()}
+}
 
 /* ---------- users (superadmin) ---------- */
 function users(){
@@ -425,8 +780,8 @@ function users(){
 }
 async function addEnc(e){
   e.preventDefault();const f=e.target,name=$('#un').value.trim(),email=$('#ue').value.trim(),pw=$('#up').value,a=firebase.initializeApp(cfg,'x'+Date.now());
-  try{const c=await a.auth().createUserWithEmailAndPassword(email,pw);await fs.doc('users/'+c.user.uid).set({name,email,role:'encoder',active:true,by:me.uid,at:TS});f.reset();alert('Encoder created.')}
-  catch(x){alert('Failed: '+x.message)}finally{try{await a.auth().signOut()}catch(_){}a.delete()}
+  try{const c=await a.auth().createUserWithEmailAndPassword(email,pw);await fs.doc('users/'+c.user.uid).set({name,email,role:'encoder',active:true,by:me.uid,at:TS});f.reset();uiAlert('Encoder created.')}
+  catch(x){uiAlert('Failed: '+x.message)}finally{try{await a.auth().signOut()}catch(_){}a.delete()}
 }
-const approve=(uid,role)=>{const r=Q[uid],bt=fs.batch();bt.set(fs.doc('users/'+uid),{name:r.name||r.email,email:r.email,role,active:true,by:me.uid,at:TS});bt.delete(fs.doc('requests/'+uid));aud(bt,'USER_APPROVE','users',uid,null,{role},'');bt.commit().catch(x=>alert(x.message))};
+const approve=(uid,role)=>{const r=Q[uid],bt=fs.batch();bt.set(fs.doc('users/'+uid),{name:r.name||r.email,email:r.email,role,active:true,by:me.uid,at:TS});bt.delete(fs.doc('requests/'+uid));aud(bt,'USER_APPROVE','users',uid,null,{role},'');bt.commit().catch(x=>uiAlert(x.message))};
 </script></body></html>
